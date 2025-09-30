@@ -1,0 +1,2857 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Interactive UX Roles Table</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f4f6f8;
+      margin: 0;
+      padding: 20px;
+    }
+    .product-selector {
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .product-selector h3 {
+      margin: 0 0 10px 0;
+      color: #2c3e50;
+    }
+    .product-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .product-btn {
+      padding: 8px 16px;
+      border: 2px solid #3498db;
+      background: white;
+      color: #3498db;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+    }
+    .product-btn:hover {
+      background: #3498db;
+      color: white;
+    }
+    .product-btn.active {
+      background: #3498db;
+      color: white;
+    }
+    .edit-controls {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #e0e0e0;
+    }
+    .edit-toggle {
+      padding: 8px 16px;
+      border: 2px solid #3498db;
+      background: white;
+      color: #3498db;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+    .edit-toggle:hover {
+      background: #3498db;
+      color: white;
+    }
+    .edit-toggle.active {
+      background: #3498db;
+      color: white;
+    }
+    .edit-mode-info {
+      font-size: 0.8em;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+    .edit-mode td:not(:first-child) {
+      cursor: pointer;
+    }
+    .edit-mode td:not(:first-child):hover {
+      background-color: #f8f9fa !important;
+      border-color: #6c757d !important;
+    }
+    td.selected-for-edit {
+      background-color: #fff3cd !important;
+      border: 2px solid #ffc107 !important;
+      box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+    }
+    .preset-controls {
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .preset-controls h3 {
+      margin: 0 0 10px 0;
+      color: #2c3e50;
+    }
+    .preset-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .preset-btn {
+      padding: 8px 16px;
+      border: 2px solid #9b59b6;
+      background: white;
+      color: #9b59b6;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+    }
+    .preset-btn:hover {
+      background: #9b59b6;
+      color: white;
+    }
+    .preset-btn.active {
+      background: #9b59b6;
+      color: white;
+    }
+    .preset-edit-toggle {
+      padding: 8px 16px;
+      border: 2px solid #8e44ad;
+      background: white;
+      color: #8e44ad;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+      margin-right: 10px;
+    }
+    .preset-edit-toggle:hover {
+      background: #8e44ad;
+      color: white;
+    }
+    .preset-edit-toggle.active {
+      background: #8e44ad;
+      color: white;
+    }
+    .preset-dot {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #9b59b6;
+      border: 3px solid white;
+      box-shadow: 0 2px 6px rgba(155, 89, 182, 0.5);
+      z-index: 100;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+    }
+    .preset-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 50;
+    }
+    table {
+      position: relative;
+    }
+    td.preset-selected {
+      background-color: #f3e5f5 !important;
+      border: 2px solid #9b59b6 !important;
+    }
+    .factors-panel {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .factors-panel h3 {
+      margin: 0 0 10px 0;
+      color: #2c3e50;
+      font-size: 0.9em;
+    }
+    .factors-content {
+      flex: 1;
+    }
+    .factors-equalizer-wrapper {
+      flex-shrink: 0;
+      border-left: 1px solid #e0e0e0;
+      padding-left: 20px;
+    }
+    .factors-equalizer {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      justify-content: space-around;
+      padding: 10px;
+      background: #ffffff;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    .factor-slider {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+    }
+    .factor-slider label {
+      font-size: 0.65em;
+      color: #2c3e50;
+      text-align: center;
+      font-weight: 500;
+      min-height: 24px;
+      display: flex;
+      align-items: center;
+      max-width: 60px;
+      line-height: 1.1;
+    }
+    .bar-container {
+      position: relative;
+      height: 100px;
+      width: 30px;
+      background: #e8e8e8;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column-reverse;
+    }
+    .bar-container:hover {
+      background: #d0d0d0;
+    }
+    .bar-container[data-factor] {
+      border: 2px solid #3498db;
+      background: #f0f8ff;
+    }
+    .bar-container[data-factor]:hover {
+      border-color: #2980b9;
+      background: #e6f3ff;
+    }
+    .bar-fill {
+      width: 100%;
+      background: linear-gradient(to top, #774591 0%, #58336b 100%);
+      transition: height 0.5s ease-out;
+      border-radius: 2px;
+    }
+    .factor-value {
+      font-size: 0.7em;
+      color: #7f8c8d;
+      font-weight: bold;
+      min-width: 20px;
+      text-align: center;
+    }
+    .factor-input {
+      width: 48px;
+      padding: 4px 6px;
+      border: 1px solid #bdc3c7;
+      border-radius: 4px;
+      font-size: 0.7em;
+      text-align: center;
+      color: #2c3e50;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      display: none;
+    }
+    .factor-input:disabled {
+      background-color: #f4f6f8;
+      color: #95a5a6;
+      cursor: not-allowed;
+    }
+    .factor-input:not(:disabled):focus {
+      outline: none;
+      border-color: #9b59b6;
+      box-shadow: 0 0 0 2px rgba(155, 89, 182, 0.15);
+    }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin: 0 0 10px 0;
+      color: #2c3e50;
+    }
+    .panel-title {
+      flex-grow: 1;
+    }
+    .collapse-btn {
+      background: none;
+      border: 1px solid #bdc3c7;
+      border-radius: 3px;
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+      color: #7f8c8d;
+      transition: all 0.2s ease;
+    }
+    .collapse-btn:hover {
+      background: #ecf0f1;
+      color: #2c3e50;
+    }
+    .panel-content {
+      transition: all 0.3s ease;
+      overflow: hidden;
+    }
+    .panel-content.collapsed {
+      display: none;
+    }
+    .preset-panel-layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      background-color: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th {
+      background-color: #2c3e50;
+      color: #ecf0f1;
+      padding: 15px;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+    td {
+      border: 1px solid #e0e0e0;
+      padding: 15px;
+      text-align: left;
+      vertical-align: top;
+      position: relative;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+      background-color: #ffffff;
+    }
+    td.highlighted {
+      background-color: #e8f4fd !important;
+      border: 2px solid #3498db !important;
+      box-shadow: 0 0 10px rgba(52, 152, 219, 0.3);
+    }
+    td.expanded {
+      background-color: #f0f8ff;
+    }
+    td.highlighted.expanded {
+      background-color: #d4edfd !important;
+    }
+    .cell-content {
+      display: block;
+      font-weight: 500;
+      color: #34495e;
+    }
+    .cell-detail {
+      display: none;
+      margin-top: 10px;
+      font-size: 0.9em;
+      color: #7f8c8d;
+    }
+    .flyout {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 320px;
+      background: #ffffff;
+      border: 1px solid #bdc3c7;
+      padding: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      border-radius: 6px;
+      font-size: 0.9em;
+      color: #2c3e50;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+<body>
+  <div class="preset-controls">
+    <h3 class="panel-header" id="presetPanelHeader">
+      <span class="panel-title">Profile Presets</span>
+      <button class="collapse-btn" id="presetCollapseBtn">−</button>
+    </h3>
+    <div class="panel-content preset-panel-layout" id="presetPanelContent">
+      <div style="flex: 1;">
+        <div class="preset-buttons" id="presetButtonsContainer">
+          <!-- Preset buttons will be dynamically generated here -->
+        </div>
+        <div style="margin-top: 10px;">
+          <button class="preset-edit-toggle" id="presetEditToggle">Edit</button>
+          <select id="editPresetSelect" style="display:none; padding: 5px; margin-right: 10px;">
+            <!-- Options will be dynamically generated -->
+          </select>
+          <button id="addPresetBtn" style="display:none; padding: 5px 12px; background: #16a085; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Add</button>
+          <button id="renamePresetBtn" style="display:none; padding: 5px 12px; background: #3498db; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Rename</button>
+          <button id="deletePresetBtn" style="display:none; padding: 5px 12px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Delete</button>
+          <div class="edit-mode-info" id="presetEditInfo" style="display:none; margin-top: 5px;">Click on the factor sliders to adjust user expertise and capability values for this profile preset.</div>
+        </div>
+      </div>
+      <div style="flex-shrink: 0;">
+        <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 0.9em;">Situational Factors</h3>
+        <div class="factors-equalizer">
+      <div class="factor-slider">
+        <div class="bar-container">
+          <div class="bar-fill" id="bar-expertise" style="height: 0%;"></div>
+        </div>
+        <div class="factor-value" id="value-expertise">-</div>
+  <input type="number" min="0" max="100" step="1" class="factor-input" id="input-expertise" value="" disabled />
+        <label for="bar-expertise">Human Expertise</label>
+      </div>
+      <div class="factor-slider">
+        <div class="bar-container">
+          <div class="bar-fill" id="bar-aicapability" style="height: 0%;"></div>
+        </div>
+        <div class="factor-value" id="value-aicapability">-</div>
+  <input type="number" min="0" max="100" step="1" class="factor-input" id="input-aicapability" value="" disabled />
+        <label for="bar-aicapability">AI Capability</label>
+      </div>
+      <div class="factor-slider">
+        <div class="bar-container">
+          <div class="bar-fill" id="bar-governance" style="height: 0%;"></div>
+        </div>
+        <div class="factor-value" id="value-governance">-</div>
+  <input type="number" min="0" max="100" step="1" class="factor-input" id="input-governance" value="" disabled />
+        <label for="bar-governance">Governance & Safety</label>
+      </div>
+    </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="preset-controls">
+    <h3 class="panel-header" id="scenarioPanelHeader">
+      <span class="panel-title">Scenarios</span>
+      <button class="collapse-btn" id="scenarioCollapseBtn">−</button>
+    </h3>
+    <div class="panel-content preset-panel-layout" id="scenarioPanelContent">
+      <div style="flex: 1;">
+        <div class="preset-buttons" id="scenarioButtonsContainer">
+          <!-- Scenario buttons will be dynamically generated here -->
+        </div>
+        <div style="margin-top: 10px;">
+          <button class="preset-edit-toggle" id="scenarioEditToggle">Edit</button>
+          <select id="editScenarioSelect" style="display:none; padding: 5px; margin-right: 10px;">
+            <!-- Options will be dynamically generated -->
+          </select>
+          <button id="addScenarioBtn" style="display:none; padding: 5px 12px; background: #16a085; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Add</button>
+          <button id="renameScenarioBtn" style="display:none; padding: 5px 12px; background: #3498db; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Rename</button>
+          <button id="deleteScenarioBtn" style="display:none; padding: 5px 12px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Delete</button>
+          <div class="edit-mode-info" id="scenarioEditInfo" style="display:none; margin-top: 5px;">Click on cells in order to create the workflow path. The order matters - cells will be connected in the sequence you click them. Click on the factor sliders to adjust their values.</div>
+        </div>
+      </div>
+      <div style="flex-shrink: 0;">
+        <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 0.9em;">Situational Factors</h3>
+        <div class="factors-equalizer">
+      <div class="factor-slider">
+        <div class="bar-container">
+          <div class="bar-fill" id="bar-scenario-importance" style="height: 0%;"></div>
+        </div>
+        <div class="factor-value" id="value-scenario-importance">-</div>
+  <input type="number" min="0" max="100" step="1" class="factor-input" id="input-scenario-importance" value="" disabled />
+        <label for="bar-scenario-importance">Task Importance</label>
+      </div>
+      <div class="factor-slider">
+        <div class="bar-container">
+          <div class="bar-fill" id="bar-scenario-complexity" style="height: 0%;"></div>
+        </div>
+        <div class="factor-value" id="value-scenario-complexity">-</div>
+  <input type="number" min="0" max="100" step="1" class="factor-input" id="input-scenario-complexity" value="" disabled />
+        <label for="bar-scenario-complexity">Task Complexity</label>
+      </div>
+      <div class="factor-slider">
+        <div class="bar-container">
+          <div class="bar-fill" id="bar-scenario-maturity" style="height: 0%;"></div>
+        </div>
+        <div class="factor-value" id="value-scenario-maturity">-</div>
+  <input type="number" min="0" max="100" step="1" class="factor-input" id="input-scenario-maturity" value="" disabled />
+        <label for="bar-scenario-maturity">Codebase Maturity</label>
+      </div>
+    </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="product-selector">
+    <h3 class="panel-header" id="productPanelHeader">
+      <span class="panel-title">Product Capabilities</span>
+      <button class="collapse-btn" id="productCollapseBtn">−</button>
+    </h3>
+    <div class="panel-content" id="productPanelContent">
+      <div class="product-buttons" id="productButtonsContainer">
+      <!-- Product buttons will be dynamically generated here -->
+    </div>
+    <div class="edit-controls">
+      <button class="edit-toggle" id="editModeToggle">Edit</button>
+      <select id="editProductSelect" style="display:none; padding: 5px; margin-right: 10px;">
+        <!-- Options will be dynamically generated -->
+      </select>
+      <button id="addProductBtn" style="display:none; padding: 5px 12px; background: #16a085; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Add</button>
+      <button id="renameProductBtn" style="display:none; padding: 5px 12px; background: #3498db; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Rename</button>
+      <button id="deleteProductBtn" style="display:none; padding: 5px 12px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; margin-left: 5px;">Delete</button>
+      <div class="edit-mode-info" id="editModeInfo" style="display:none;">Click on cells to select/deselect them for the chosen product. Selected cells will be highlighted in yellow.</div>
+      </div>
+    </div>
+  </div>
+  
+  <div style="position: relative;">
+    <canvas id="presetCanvas" class="preset-canvas"></canvas>
+    <table id="uxTable">
+      <thead>
+        <tr>
+          <th></th>
+          <th>Code Focused</th>
+          <th>Intent Focused</th>
+          <th>Orchestration Focused</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><th>Tool</th><td></td><td></td><td></td></tr>
+        <tr><th>Advisor</th><td></td><td></td><td></td></tr>
+        <tr><th>Co-Creator</th><td></td><td></td><td></td></tr>
+        <tr><th>Team-Mate</th><td></td><td></td><td></td></tr>
+        <tr><th>Delegate</th><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+const data = {
+  // ... (keeping the existing data structure)
+  "Tool": {
+    "Code Focused": {
+      "signature": "Local, reactive, low autonomy; optimised for incremental assist.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context inferred from current artefact; minimal explicit setup.",
+        "<strong>Generate/Act:</strong> AI responds to micro-signals; outputs small increments.",
+        "<strong>Evaluate:</strong> Quick inline review; accept or ignore instantly.",
+        "<strong>Repair/Refine:</strong> Adjust by editing or adding hints; iteration is manual.",
+        "<strong>Apply/Ship:</strong> Integrated through normal workflow; no orchestration layer."
+      ],
+      "detail": "Context is inferred from the current artefact and recent actions. AI reacts to immediate signals with small, context-aware outputs. Human reviews and integrates outputs quickly, making manual refinements as needed. This mode prioritises speed and flow, with minimal trust barriers and no additional orchestration."
+    },
+    "Intent Focused": {
+      "signature": "Reactive to stated goals; bridges natural language and structured outputs.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context comes from explicit goals or task descriptions.",
+        "<strong>Generate/Act:</strong> AI generates outputs aligned to stated intent.",
+        "<strong>Evaluate:</strong> Human checks alignment with objectives and constraints.",
+        "<strong>Repair/Refine:</strong> Refinement happens by rephrasing or clarifying intent.",
+        "<strong>Apply/Ship:</strong> Outputs integrated into workflow after validation."
+      ],
+      "detail": "Human provides explicit goals or instructions in natural language or structured prompts. AI interprets these and generates outputs aligned with intent. Evaluation focuses on whether outputs meet objectives. Refinement occurs through rephrasing or clarifying goals. Integration follows standard processes."
+    },
+    "Orchestration Focused": {
+      "signature": "Reactive coordination; supports multi-step workflows without autonomy.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context defined by workflow steps or orchestration scripts.",
+        "<strong>Generate/Act:</strong> AI executes discrete tasks within a larger process.",
+        "<strong>Evaluate:</strong> Human validates each step before proceeding.",
+        "<strong>Repair/Refine:</strong> Refinement involves adjusting workflow parameters.",
+        "<strong>Apply/Ship:</strong> Outputs combined into the orchestrated system manually."
+      ],
+      "detail": "Human defines workflow steps or orchestration scripts. AI executes individual tasks but does not self-direct. Human validates outputs at each stage and adjusts parameters as needed. Integration happens within the orchestrated system, requiring human oversight for sequencing and dependencies."
+    }
+  },
+  "Advisor": {
+    "Code Focused": {
+      "signature": "Choice-oriented, human-in-control; ideal for trust-building and compliance-heavy work.",
+      "sentences": [
+        "<strong>Set Context:</strong> Provide richer hints or annotations to frame options.",
+        "<strong>Generate/Act:</strong> AI proposes multiple alternatives for comparison.",
+        "<strong>Evaluate:</strong> Human weighs trade-offs; higher cognitive load than Tool mode.",
+        "<strong>Repair/Refine:</strong> Request new options or tweak framing for better fit.",
+        "<strong>Apply/Ship:</strong> Manual integration; standard validation applies."
+      ],
+      "detail": "Human frames the problem with richer hints or annotations. AI generates multiple alternatives, leaving selection to the human. Evaluation involves comparing trade-offs like efficiency or clarity. Refinement occurs through iterative requests for new options. Integration remains manual, with standard validation."
+    },
+    "Intent Focused": {
+      "signature": "Goal-driven suggestions; supports decision-making without full automation.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context comes from high-level goals or desired outcomes.",
+        "<strong>Generate/Act:</strong> AI offers alternative strategies or plans.",
+        "<strong>Evaluate:</strong> Human evaluates feasibility and alignment with objectives.",
+        "<strong>Repair/Refine:</strong> Refinement involves clarifying priorities or constraints.",
+        "<strong>Apply/Ship:</strong> Chosen approach integrated into workflow manually."
+      ],
+      "detail": "Human specifies goals or desired outcomes. AI suggests alternative strategies or plans, leaving decision-making to the human. Evaluation focuses on feasibility and alignment. Refinement occurs by clarifying priorities or constraints. Integration is manual, ensuring human control."
+    },
+    "Orchestration Focused": {
+      "signature": "Advisory role in complex workflows; human retains orchestration control.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context defined by multi-agent or multi-step objectives.",
+        "<strong>Generate/Act:</strong> AI suggests orchestration patterns or task allocations.",
+        "<strong>Evaluate:</strong> Human validates and selects orchestration strategy.",
+        "<strong>Repair/Refine:</strong> Refinement involves adjusting dependencies or sequencing.",
+        "<strong>Apply/Ship:</strong> Integration requires manual coordination across systems."
+      ],
+      "detail": "Human defines multi-step objectives. AI advises on orchestration strategies, such as task allocation or sequencing. Human validates and selects the approach. Refinement involves adjusting dependencies or constraints. Integration requires manual coordination across systems."
+    }
+  },
+  "Co-Creator": {
+    "Code Focused": {
+      "signature": "Collaborative, high-context, medium autonomy; accelerates creative work.",
+      "sentences": [
+        "<strong>Set Context:</strong> Supply partial structure or examples to guide AI.",
+        "<strong>Generate/Act:</strong> AI contributes substantial components within human direction.",
+        "<strong>Evaluate:</strong> Review for correctness and alignment with goals.",
+        "<strong>Repair/Refine:</strong> Iterative back-and-forth; conversational adjustments.",
+        "<strong>Apply/Ship:</strong> Merge after validation; fits into existing delivery pipeline."
+      ],
+      "detail": "Human provides partial structure or examples. AI generates substantial components, guided by human direction. Evaluation ensures correctness and alignment. Refinement occurs through iterative, conversational adjustments. Outputs are integrated after validation."
+    },
+    "Intent Focused": {
+      "signature": "Shared authorship; human sets intent, AI fills in details.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context comes from detailed goals or scenarios.",
+        "<strong>Generate/Act:</strong> AI drafts plans or artefacts aligned with intent.",
+        "<strong>Evaluate:</strong> Human reviews for completeness and relevance.",
+        "<strong>Repair/Refine:</strong> Refinement through iterative clarification of goals.",
+        "<strong>Apply/Ship:</strong> Outputs integrated into broader workflow after review."
+      ],
+      "detail": "Human provides detailed goals or scenarios. AI drafts plans or artefacts aligned with intent. Human reviews for completeness and relevance. Refinement occurs through iterative clarification. Integration follows standard workflows."
+    },
+    "Orchestration Focused": {
+      "signature": "Collaborative orchestration; AI manages sub-tasks under human guidance.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context defined by overarching objectives and constraints.",
+        "<strong>Generate/Act:</strong> AI proposes orchestration plans and executes sub-tasks.",
+        "<strong>Evaluate:</strong> Human monitors progress and validates milestones.",
+        "<strong>Repair/Refine:</strong> Refinement involves adjusting orchestration logic.",
+        "<strong>Apply/Ship:</strong> Outputs integrated into the system after milestone checks."
+      ],
+      "detail": "Human defines overarching objectives and constraints. AI proposes orchestration plans and executes sub-tasks. Human monitors progress and validates milestones. Refinement involves adjusting orchestration logic. Outputs are integrated after milestone checks."
+    }
+  },
+  "Team-Mate": {
+    "Code Focused": {
+      "signature": "Goal-driven, semi-autonomous; mirrors human team dynamics.",
+      "sentences": [
+        "<strong>Set Context:</strong> Define objectives and constraints at a higher level.",
+        "<strong>Generate/Act:</strong> AI drafts across multiple artefacts; human monitors.",
+        "<strong>Evaluate:</strong> Oversight similar to reviewing a colleague’s work.",
+        "<strong>Repair/Refine:</strong> Feedback via structured comments or edits; AI iterates.",
+        "<strong>Apply/Ship:</strong> Integration after thorough review and testing."
+      ],
+      "detail": "Human defines objectives and constraints. AI drafts across multiple artefacts, with human oversight. Evaluation mirrors reviewing a colleague’s work. Refinement occurs through structured feedback. Integration follows thorough review and testing."
+    },
+    "Intent Focused": {
+      "signature": "Semi-autonomous execution; human provides goals, AI plans and acts.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context comes from high-level goals and constraints.",
+        "<strong>Generate/Act:</strong> AI plans steps and executes tasks toward the goal.",
+        "<strong>Evaluate:</strong> Human validates progress at checkpoints.",
+        "<strong>Repair/Refine:</strong> Refinement involves adjusting goals or priorities.",
+        "<strong>Apply/Ship:</strong> Outputs integrated after milestone approval."
+      ],
+      "detail": "Human provides high-level goals and constraints. AI plans and executes tasks toward the goal. Human validates progress at checkpoints. Refinement occurs by adjusting goals or priorities. Outputs are integrated after milestone approval."
+    },
+    "Orchestration Focused": {
+      "signature": "AI acts as a managed collaborator; executes orchestration plans under oversight.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context defined by multi-step objectives and dependencies.",
+        "<strong>Generate/Act:</strong> AI coordinates agents and resources to achieve goals.",
+        "<strong>Evaluate:</strong> Human reviews orchestration outcomes at key stages.",
+        "<strong>Repair/Refine:</strong> Refinement involves rebalancing tasks or dependencies.",
+        "<strong>Apply/Ship:</strong> Outputs integrated after orchestration validation."
+      ],
+      "detail": "Human defines multi-step objectives and dependencies. AI coordinates agents and resources to achieve goals. Human reviews orchestration outcomes at key stages. Refinement involves rebalancing tasks or dependencies. Outputs are integrated after validation."
+    }
+  },
+  "Delegate": {
+    "Code Focused": {
+      "signature": "High autonomy, milestone-driven; ideal for scale and speed under governance.",
+      "sentences": [
+        "<strong>Set Context:</strong> Specify goals and constraints in structured form.",
+        "<strong>Generate/Act:</strong> AI executes large portions independently.",
+        "<strong>Evaluate:</strong> Validate outputs at checkpoints, not line-by-line.",
+        "<strong>Repair/Refine:</strong> Adjust goals or constraints rather than micro details.",
+        "<strong>Apply/Ship:</strong> Integrate after milestone validation and dependency checks."
+      ],
+      "detail": "Human specifies goals and constraints in structured form. AI executes large portions independently. Human validates outputs at milestones. Refinement occurs at the goal level. Integration follows milestone validation and dependency checks."
+    },
+    "Intent Focused": {
+      "signature": "AI owns execution; human defines intent and validates outcomes.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context comes from explicit goals and success criteria.",
+        "<strong>Generate/Act:</strong> AI autonomously plans and executes tasks.",
+        "<strong>Evaluate:</strong> Human validates outputs against objectives.",
+        "<strong>Repair/Refine:</strong> Refinement involves redefining goals or constraints.",
+        "<strong>Apply/Ship:</strong> Outputs integrated after final approval."
+      ],
+      "detail": "Human defines explicit goals and success criteria. AI autonomously plans and executes tasks. Human validates outputs against objectives. Refinement occurs by redefining goals or constraints. Outputs are integrated after final approval."
+    },
+    "Orchestration Focused": {
+      "signature": "Full orchestration autonomy; human sets direction and validates milestones.",
+      "sentences": [
+        "<strong>Set Context:</strong> Context defined by overarching objectives and governance rules.",
+        "<strong>Generate/Act:</strong> AI manages orchestration end-to-end across agents and systems.",
+        "<strong>Evaluate:</strong> Human validates at major milestones only.",
+        "<strong>Repair/Refine:</strong> Refinement involves adjusting governance or objectives.",
+        "<strong>Apply/Ship:</strong> Outputs integrated automatically after approval."
+      ],
+      "detail": "Human defines overarching objectives and governance rules. AI manages orchestration end-to-end across agents and systems. Human validates at major milestones. Refinement occurs by adjusting governance or objectives. Outputs are integrated automatically after approval."
+    }
+  }
+};
+    const table = document.getElementById('uxTable');
+    const presetCanvas = document.getElementById('presetCanvas');
+    const presetCtx = presetCanvas.getContext('2d');
+    let currentPreset = null;
+    let currentScenario = null;
+    let activeCell = null;
+    let flyoutTimer = null;
+
+    for (let row of table.rows) {
+      for (let cell of row.cells) {
+        if (cell.cellIndex === 0 || row.rowIndex === 0) continue;
+        const rowLabel = table.rows[cell.parentNode.rowIndex].cells[0].textContent;
+        const colLabel = table.rows[0].cells[cell.cellIndex].textContent;
+        const cellData = data[rowLabel]?.[colLabel];
+        if (!cellData) continue;
+
+        cell.innerHTML = `<span class="cell-content">${cellData.signature}</span><div class="cell-detail" style="display: block;">${cellData.sentences.join('<br>')}</div><div class="flyout">${cellData.detail}</div>`;
+
+        cell.addEventListener('mouseenter', () => {
+          if (activeCell && activeCell !== cell) {
+            activeCell.classList.remove('expanded');
+            activeCell.querySelector('.flyout').style.display = 'none';
+            clearTimeout(flyoutTimer);
+          }
+          cell.classList.add('expanded');
+          flyoutTimer = setTimeout(() => {
+            const flyout = cell.querySelector('.flyout');
+            const isLastRow = cell.parentNode.rowIndex === table.rows.length - 1;
+            if (isLastRow) {
+              flyout.style.top = 'auto';
+              flyout.style.bottom = '100%';
+              flyout.style.marginTop = '0';
+              flyout.style.marginBottom = '5px';
+            } else {
+              flyout.style.top = '100%';
+              flyout.style.bottom = 'auto';
+              flyout.style.marginTop = '5px';
+              flyout.style.marginBottom = '0';
+            }
+            flyout.style.display = 'block';
+          }, 1000);
+          activeCell = cell;
+        });
+
+        cell.addEventListener('mouseleave', () => {
+          clearTimeout(flyoutTimer);
+          cell.classList.remove('expanded');
+          cell.querySelector('.flyout').style.display = 'none';
+        });
+      }
+    }
+
+    // Initialize canvas size
+    function resizeCanvas() {
+      const tableRect = table.getBoundingClientRect();
+      presetCanvas.width = tableRect.width;
+      presetCanvas.height = tableRect.height;
+    }
+    
+    function redrawCurrentWorkflow() {
+      // Redraw workflow if both preset and scenario are selected
+      if (currentPreset && currentScenario) {
+        drawWorkflow(currentPreset, currentScenario);
+      }
+    }
+    
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+      resizeCanvas();
+      redrawCurrentWorkflow();
+    });
+
+    // Workflow visualization functions
+    function drawWorkflow(presetKey, scenarioKey) {
+      currentPreset = presetKey;
+      currentScenario = scenarioKey;
+      clearPresetVisualization();
+      
+      // Look up workflow using composite key "preset:scenario"
+      const workflowKey = `${presetKey}:${scenarioKey}`;
+      const workflow = workflows[workflowKey] || [];
+      if (workflow.length === 0) return;
+
+      // Clear existing dots
+      document.querySelectorAll('.preset-dot').forEach(dot => dot.remove());
+      document.querySelectorAll('td.preset-selected').forEach(cell => cell.classList.remove('preset-selected'));
+
+      const points = [];
+      
+      // Create dots and collect points
+      workflow.forEach(([role, focus], index) => {
+        const cell = findCell(role, focus);
+        if (cell) {
+          cell.classList.add('preset-selected');
+          
+          // Create dot
+          const dot = document.createElement('div');
+          dot.className = 'preset-dot';
+          dot.textContent = index + 1;
+          
+          const cellRect = cell.getBoundingClientRect();
+          const tableRect = table.getBoundingClientRect();
+          
+          const x = cellRect.left - tableRect.left + cellRect.width / 2;
+          const y = cellRect.top - tableRect.top + cellRect.height / 2;
+          
+          dot.style.left = (x - 10) + 'px';
+          dot.style.top = (y - 10) + 'px';
+          
+          table.parentElement.appendChild(dot);
+          
+          points.push({ x, y });
+        }
+      });
+
+      // Draw lines connecting the dots
+      if (points.length > 1) {
+        presetCtx.clearRect(0, 0, presetCanvas.width, presetCanvas.height);
+        presetCtx.strokeStyle = '#9b59b6';
+        presetCtx.lineWidth = 3;
+        presetCtx.setLineDash([5, 5]);
+        presetCtx.lineCap = 'round';
+        presetCtx.lineJoin = 'round';
+
+        // Draw curved lines between points
+        for (let i = 0; i < points.length - 1; i++) {
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          
+          // Calculate control points for quadratic curve
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Create a curve that bends perpendicular to the line
+          // The amount of curve is proportional to the distance
+          const curvature = Math.min(distance * 0.3, 50);
+          
+          // Calculate perpendicular direction
+          const perpX = -dy / distance;
+          const perpY = dx / distance;
+          
+          // Control point is offset perpendicular to the line
+          const controlX = (p1.x + p2.x) / 2 + perpX * curvature;
+          const controlY = (p1.y + p2.y) / 2 + perpY * curvature;
+          
+          presetCtx.beginPath();
+          presetCtx.moveTo(p1.x, p1.y);
+          presetCtx.quadraticCurveTo(controlX, controlY, p2.x, p2.y);
+          presetCtx.stroke();
+        }
+      }
+    }
+
+    function clearPresetVisualization() {
+      presetCtx.clearRect(0, 0, presetCanvas.width, presetCanvas.height);
+      document.querySelectorAll('.preset-dot').forEach(dot => dot.remove());
+      document.querySelectorAll('td.preset-selected').forEach(cell => cell.classList.remove('preset-selected'));
+      // Note: Do not clear currentPreset here - that should be managed by the caller
+    }
+
+    // Product capability mapping
+    const defaultProductCapabilities = {
+      'github-copilot': [
+        ['Tool', 'Code Focused'],
+        ['Advisor', 'Code Focused'],
+        ['Co-Creator', 'Code Focused']
+      ],
+      'spec-kit': [
+        ['Advisor', 'Intent Focused'],
+        ['Co-Creator', 'Intent Focused'],
+        ['Team-Mate', 'Intent Focused']
+      ],
+      'cursor': [
+        ['Tool', 'Code Focused'],
+        ['Co-Creator', 'Code Focused'],
+        ['Team-Mate', 'Code Focused']
+      ],
+      'claude': [
+        ['Advisor', 'Intent Focused'],
+        ['Co-Creator', 'Intent Focused'],
+        ['Team-Mate', 'Intent Focused'],
+        ['Delegate', 'Intent Focused']
+      ],
+      'copilot-agents': [
+        ['Co-Creator', 'Intent Focused'],
+        ['Team-Mate', 'Intent Focused']
+      ]
+    };
+    
+    // Default product display names
+    const defaultProductMetadata = {
+      'github-copilot': 'GitHub Copilot Completions, NES',
+      'spec-kit': 'spec-kit',
+      'cursor': 'Cursor IDE',
+      'claude': 'Claude',
+      'copilot-agents': 'GitHub Copilot Agent Mode'
+    };
+
+    // Load product capabilities from localStorage or use defaults
+    let productCapabilities = loadProductCapabilities();
+    let productMetadata = loadProductMetadata();
+
+    // Default preset workflows (REMOVED - now in scenarios)
+    const defaultPresets = {
+      'enterprise-maintainer': [],
+      'ai-native-product-maker': [],
+      'domain-expert-orchestrator': []
+    };
+
+    // Situational factors for each preset (0-100 scale) - Only 3 factors now
+    // Higher values = more of that factor
+    const defaultPresetFactors = {
+      'enterprise-maintainer': {
+        expertise: 75,       // High expertise - seasoned professional
+        aicapability: 60,    // Moderate AI capability - balanced approach
+        governance: 85       // High governance - enterprise standards
+      },
+      'ai-native-product-maker': {
+        expertise: 65,       // Good expertise - product focused
+        aicapability: 90,    // Very high AI capability - AI-first approach
+        governance: 40       // Lower governance - innovation focused
+      },
+      'domain-expert-orchestrator': {
+        expertise: 80,       // Very high expertise - domain authority
+        aicapability: 70,    // Good AI capability - orchestration tools
+        governance: 60       // Moderate governance - balanced oversight
+      }
+    };
+
+    // Default preset display names
+    const defaultPresetMetadata = {
+      'enterprise-maintainer': 'Enterprise Maintainer',
+      'ai-native-product-maker': 'AI-Native Product-Maker',
+      'domain-expert-orchestrator': 'Domain Expert Orchestrator'
+    };
+
+    // Default workflows - keyed by "preset:scenario" combinations
+    // Workflows are unique to each preset+scenario pair
+    const defaultWorkflows = {
+      'enterprise-maintainer:prototyping': [],
+      'ai-native-product-maker:prototyping': [],
+      'domain-expert-orchestrator:prototyping': []
+      // More preset:scenario combinations can be added as users create them
+    };
+
+    // Scenario factors are ALSO keyed by "preset:scenario" combinations
+    // Different presets can have different factor values for the same scenario
+    const defaultScenarioFactors = {
+      'enterprise-maintainer:prototyping': {
+        importance: 50,
+        complexity: 50,
+        maturity: 50
+      },
+      'ai-native-product-maker:prototyping': {
+        importance: 50,
+        complexity: 50,
+        maturity: 50
+      },
+      'domain-expert-orchestrator:prototyping': {
+        importance: 50,
+        complexity: 50,
+        maturity: 50
+      }
+    };
+
+    // Scenario metadata is now PRESET-SPECIFIC
+    // Each preset has its own list of scenarios
+    const defaultScenarioMetadata = {
+      'enterprise-maintainer': {
+        'prototyping': 'Prototyping'
+      },
+      'ai-native-product-maker': {
+        'prototyping': 'Prototyping'
+      },
+      'domain-expert-orchestrator': {
+        'prototyping': 'Prototyping'
+      }
+      // Each preset must have at least one scenario (prototyping with factors=50)
+    };
+
+    // Load presets from localStorage or use defaults
+    let presets = loadPresets();
+    let presetFactors = loadPresetFactors();
+    let presetMetadata = loadPresetMetadata();
+
+    // Load workflows and scenarios from localStorage or use defaults
+    let workflows = loadWorkflows();
+    let scenarioFactors = loadScenarioFactors();
+    let scenarioMetadata = loadScenarioMetadata();
+    
+    // Validate and migrate data if needed
+    function validateAndMigrateData() {
+      // Check if we have the expected presets
+      const expectedPresets = ['enterprise-maintainer', 'ai-native-product-maker', 'domain-expert-orchestrator'];
+      const hasExpectedPresets = expectedPresets.every(key => presets.hasOwnProperty(key));
+      
+      if (!hasExpectedPresets) {
+        // Reset to defaults
+        console.log('Migrating to new preset structure...');
+        presets = JSON.parse(JSON.stringify(defaultPresets));
+        presetFactors = JSON.parse(JSON.stringify(defaultPresetFactors));
+        presetMetadata = JSON.parse(JSON.stringify(defaultPresetMetadata));
+        workflows = JSON.parse(JSON.stringify(defaultWorkflows));
+        scenarioFactors = JSON.parse(JSON.stringify(defaultScenarioFactors));
+        scenarioMetadata = JSON.parse(JSON.stringify(defaultScenarioMetadata));
+        
+        // Save the migrated data
+        savePresets();
+        saveWorkflows();
+      }
+      
+      // Ensure each preset has at least a prototyping scenario
+      expectedPresets.forEach(presetKey => {
+        if (!scenarioMetadata[presetKey] || Object.keys(scenarioMetadata[presetKey]).length === 0) {
+          if (!scenarioMetadata[presetKey]) {
+            scenarioMetadata[presetKey] = {};
+          }
+          scenarioMetadata[presetKey]['prototyping'] = 'Prototyping';
+          
+          const compositeKey = `${presetKey}:prototyping`;
+          if (!scenarioFactors[compositeKey]) {
+            scenarioFactors[compositeKey] = {
+              importance: 50,
+              complexity: 50,
+              maturity: 50
+            };
+          }
+          saveWorkflows();
+        }
+      });
+    }
+    
+    validateAndMigrateData();
+
+    function savePresets() {
+      try {
+        localStorage.setItem('uxTablePresets', JSON.stringify(presets));
+        localStorage.setItem('uxTablePresetFactors', JSON.stringify(presetFactors));
+        localStorage.setItem('uxTablePresetMetadata', JSON.stringify(presetMetadata));
+      } catch (error) {
+        console.warn('Failed to save presets to localStorage:', error);
+      }
+    }
+
+    function saveWorkflows() {
+      try {
+        localStorage.setItem('uxTableWorkflows', JSON.stringify(workflows));
+        localStorage.setItem('uxTableScenarioFactors', JSON.stringify(scenarioFactors));
+        localStorage.setItem('uxTableScenarioMetadata', JSON.stringify(scenarioMetadata));
+      } catch (error) {
+        console.warn('Failed to save workflows to localStorage:', error);
+      }
+    }
+
+    function loadPresets() {
+      try {
+        const saved = localStorage.getItem('uxTablePresets');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load presets from localStorage:', error);
+      }
+      return JSON.parse(JSON.stringify(defaultPresets));
+    }
+    
+    function loadPresetFactors() {
+      try {
+        const saved = localStorage.getItem('uxTablePresetFactors');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load preset factors from localStorage:', error);
+      }
+      // Return copy of default factors if not found
+      return JSON.parse(JSON.stringify(defaultPresetFactors));
+    }
+    
+    function loadPresetMetadata() {
+      try {
+        const saved = localStorage.getItem('uxTablePresetMetadata');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load preset metadata from localStorage:', error);
+      }
+      // Return copy of default metadata if not found
+      return JSON.parse(JSON.stringify(defaultPresetMetadata));
+    }
+
+    function loadWorkflows() {
+      try {
+        const saved = localStorage.getItem('uxTableWorkflows');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load workflows from localStorage:', error);
+      }
+      return JSON.parse(JSON.stringify(defaultWorkflows));
+    }
+    
+    function loadScenarioFactors() {
+      try {
+        const saved = localStorage.getItem('uxTableScenarioFactors');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load scenario factors from localStorage:', error);
+      }
+      return JSON.parse(JSON.stringify(defaultScenarioFactors));
+    }
+    
+    function loadScenarioMetadata() {
+      try {
+        const saved = localStorage.getItem('uxTableScenarioMetadata');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load scenario metadata from localStorage:', error);
+      }
+      return JSON.parse(JSON.stringify(defaultScenarioMetadata));
+    }
+
+    function saveProductCapabilities() {
+      try {
+        localStorage.setItem('uxTableProductCapabilities', JSON.stringify(productCapabilities));
+        localStorage.setItem('uxTableProductMetadata', JSON.stringify(productMetadata));
+      } catch (error) {
+        console.warn('Failed to save product capabilities to localStorage:', error);
+      }
+    }
+
+    function loadProductCapabilities() {
+      try {
+        const saved = localStorage.getItem('uxTableProductCapabilities');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load product capabilities from localStorage:', error);
+      }
+      // Return a copy of defaults if nothing saved or error occurred
+      return JSON.parse(JSON.stringify(defaultProductCapabilities));
+    }
+    
+    function loadProductMetadata() {
+      try {
+        const saved = localStorage.getItem('uxTableProductMetadata');
+        if (saved) {
+          return JSON.parse(saved);
+        }
+      } catch (error) {
+        console.warn('Failed to load product metadata from localStorage:', error);
+      }
+      // Return copy of default metadata if not found
+      return JSON.parse(JSON.stringify(defaultProductMetadata));
+    }
+    
+    // Initialize product UI - generate buttons and dropdown options from localStorage
+    function initializeProductUI() {
+      const productButtonsContainer = document.getElementById('productButtonsContainer');
+      const editProductSelect = document.getElementById('editProductSelect');
+      
+      // Clear all existing product buttons
+      const existingButtons = productButtonsContainer.querySelectorAll('.product-btn');
+      existingButtons.forEach(btn => btn.remove());
+      
+      // Clear dropdown options
+      editProductSelect.innerHTML = '';
+      
+      // Generate product buttons and dropdown options from loaded data
+      Object.keys(productCapabilities).forEach(productKey => {
+        // Create product button
+        const btn = document.createElement('button');
+        btn.className = 'product-btn';
+        btn.dataset.product = productKey;
+        btn.textContent = productMetadata[productKey] || productKey;
+        
+        // Add click handler for single selection with toggle
+        btn.addEventListener('click', () => {
+          const product = btn.dataset.product;
+          const isCurrentlyActive = btn.classList.contains('active');
+          
+          // Clear all other product buttons and highlights first
+          document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('active'));
+          document.querySelectorAll('td.highlighted').forEach(cell => cell.classList.remove('highlighted'));
+          
+          if (isCurrentlyActive) {
+            // If clicking the same active button, leave it deselected (toggle off)
+            // No need to set active state or highlights since we already cleared them
+          } else {
+            // Select this product (different button or reselecting after deselect)
+            btn.classList.add('active');
+            
+            // Add highlights for this product
+            const capabilities = productCapabilities[product] || [];
+            capabilities.forEach(([role, focus]) => {
+              const cell = findCell(role, focus);
+              if (cell) {
+                cell.classList.add('highlighted');
+              }
+            });
+          }
+          
+          // Update collapsed panel title if needed
+          updateCollapsedPanelTitle('Product Capabilities');
+        });
+        
+        // Add to container
+        productButtonsContainer.appendChild(btn);
+        
+        // Create dropdown option
+        const option = document.createElement('option');
+        option.value = productKey;
+        option.textContent = productMetadata[productKey] || productKey;
+        editProductSelect.appendChild(option);
+      });
+    }
+
+    // Product button event handlers
+    // (Buttons are now dynamically generated in initializeProductUI)
+
+    function findCell(role, focus) {
+      for (let row of table.rows) {
+        if (row.cells[0].textContent === role) {
+          for (let cell of row.cells) {
+            const colLabel = table.rows[0].cells[cell.cellIndex].textContent;
+            if (colLabel === focus) {
+              return cell;
+            }
+          }
+        }
+      }
+      return null;
+    }
+
+    // Function to update factor sliders for presets (only 3 factors now)
+    function updateFactorSliders(presetKey) {
+      const factors = presetFactors[presetKey];
+      if (!factors) return;
+
+      const factorNames = ['expertise', 'aicapability', 'governance'];
+      
+      factorNames.forEach(name => {
+        const bar = document.getElementById(`bar-${name}`);
+        const valueDisplay = document.getElementById(`value-${name}`);
+        const input = document.getElementById(`input-${name}`);
+        const value = factors[name];
+        
+        if (bar && valueDisplay) {
+          // Get current height percentage
+          const currentHeight = parseFloat(bar.style.height) || 0;
+          const targetHeight = value;
+          const duration = 500; // milliseconds
+          const startTime = performance.now();
+          
+          function animate(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            // Ease-out animation
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const currentValue = Math.round(currentHeight + (targetHeight - currentHeight) * easeProgress);
+            
+            bar.style.height = currentValue + '%';
+            valueDisplay.textContent = currentValue;
+            if (input) {
+              input.value = currentValue;
+            }
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            }
+          }
+          
+          requestAnimationFrame(animate);
+        }
+      });
+    }
+
+    // Function to update factor sliders for scenarios (3 different factors)
+    // Function to update factor sliders for scenarios (3 different factors)
+    // Now requires BOTH preset and scenario keys to look up the composite factor values
+    function updateScenarioFactorSliders(presetKey, scenarioKey) {
+      // Use composite key "preset:scenario" to look up factors
+      const compositeKey = `${presetKey}:${scenarioKey}`;
+      const factors = scenarioFactors[compositeKey];
+      if (!factors) return;
+
+      const factorNames = ['importance', 'complexity', 'maturity'];
+      
+      factorNames.forEach(name => {
+        const bar = document.getElementById(`bar-scenario-${name}`);
+        const valueDisplay = document.getElementById(`value-scenario-${name}`);
+        const input = document.getElementById(`input-scenario-${name}`);
+        const value = factors[name];
+        
+        if (bar && valueDisplay) {
+          const currentHeight = parseFloat(bar.style.height) || 0;
+          const targetHeight = value;
+          const duration = 500;
+          const startTime = performance.now();
+          
+          function animate(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const currentValue = Math.round(currentHeight + (targetHeight - currentHeight) * easeProgress);
+            
+            bar.style.height = currentValue + '%';
+            valueDisplay.textContent = currentValue;
+            if (input) {
+              input.value = currentValue;
+            }
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            }
+          }
+          
+          requestAnimationFrame(animate);
+        }
+      });
+    }
+
+    // Function to clear factor sliders
+    function clearFactorSliders() {
+      const factorConfigs = [
+        { barId: 'bar-expertise', valueId: 'value-expertise', inputId: 'input-expertise' },
+        { barId: 'bar-aicapability', valueId: 'value-aicapability', inputId: 'input-aicapability' },
+        { barId: 'bar-governance', valueId: 'value-governance', inputId: 'input-governance' },
+        { barId: 'bar-scenario-importance', valueId: 'value-scenario-importance', inputId: 'input-scenario-importance' },
+        { barId: 'bar-scenario-complexity', valueId: 'value-scenario-complexity', inputId: 'input-scenario-complexity' },
+        { barId: 'bar-scenario-maturity', valueId: 'value-scenario-maturity', inputId: 'input-scenario-maturity' }
+      ];
+      
+      factorConfigs.forEach(({ barId, valueId, inputId }) => {
+        const bar = document.getElementById(barId);
+        const valueDisplay = document.getElementById(valueId);
+        const input = document.getElementById(inputId);
+        
+        if (bar && valueDisplay) {
+          const currentHeight = parseFloat(bar.style.height) || 0;
+          const targetHeight = 0;
+          const duration = 500;
+          const startTime = performance.now();
+          
+          function animate(currentTime) {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            
+            const easeProgress = 1 - Math.pow(1 - progress, 3);
+            const currentValue = Math.round(currentHeight + (targetHeight - currentHeight) * easeProgress);
+            
+            bar.style.height = currentValue + '%';
+            
+            if (progress >= 1) {
+              valueDisplay.textContent = '-';
+              if (input) {
+                input.value = '';
+              }
+            } else {
+              valueDisplay.textContent = currentValue;
+              if (input) {
+                input.value = currentValue;
+              }
+            }
+            
+            if (progress < 1) {
+              requestAnimationFrame(animate);
+            }
+          }
+          
+          requestAnimationFrame(animate);
+        }
+      });
+    }
+
+    // Function to initialize preset buttons and dropdown from loaded data
+    function initializePresetUI(autoSelect = false) {
+      const presetButtonsContainer = document.querySelector('.preset-buttons');
+      const editPresetSelect = document.getElementById('editPresetSelect');
+      
+      // Clear existing preset buttons
+      const existingPresetBtns = presetButtonsContainer.querySelectorAll('.preset-btn');
+      existingPresetBtns.forEach(btn => btn.remove());
+      
+      // Clear dropdown options
+      editPresetSelect.innerHTML = '';
+      
+      // Check if we have any presets, if not create a default one
+      if (Object.keys(presets).length === 0) {
+        const defaultKey = 'custom-preset';
+        presets[defaultKey] = [];
+        presetFactors[defaultKey] = {
+          importance: 50,
+          complexity: 50,
+          expertise: 50,
+          aicapability: 50,
+          maturity: 50,
+          governance: 50
+        };
+        presetMetadata[defaultKey] = 'Custom Preset';
+        savePresets();
+      }
+      
+      let firstPresetKey = null;
+      
+      // Add buttons and dropdown options for each preset
+      Object.keys(presets).forEach((presetKey, index) => {
+        if (index === 0) firstPresetKey = presetKey;
+        
+        // Get display name from metadata or generate from key
+        const displayName = presetMetadata[presetKey] || presetKey.split('-').map(word => 
+          word.charAt(0).toUpperCase() + word.slice(1)
+        ).join(' ');
+        
+        // Create button
+        const presetBtn = document.createElement('button');
+        presetBtn.className = 'preset-btn';
+        presetBtn.dataset.preset = presetKey;
+        presetBtn.textContent = displayName;
+        
+        // Add click handler
+        presetBtn.addEventListener('click', () => {
+          const preset = presetBtn.dataset.preset;
+          
+          console.log('Preset button clicked:', preset);
+          
+          // Clear active states for preset buttons only (within preset container)
+          presetButtonsContainer.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+          
+          // Set active button
+          presetBtn.classList.add('active');
+          
+          // Update currentPreset
+          currentPreset = preset;
+          
+          console.log('currentPreset set to:', currentPreset);
+          
+          // Update preset factor sliders
+          updateFactorSliders(preset);
+          
+          // Clear scenario selection when changing presets
+          currentScenario = null;
+          clearPresetVisualization();
+          
+          console.log('About to call initializeScenarioUI, currentPreset is:', currentPreset);
+          
+          // Reinitialize scenario UI to show scenarios for this preset
+          initializeScenarioUI(true); // Auto-select first scenario
+          
+          // Update collapsed panel title if needed
+          updateCollapsedPanelTitle('Profile Presets');
+        });
+        
+        // Add to container
+        presetButtonsContainer.appendChild(presetBtn);
+        
+        // Add to dropdown
+        const option = document.createElement('option');
+        option.value = presetKey;
+        option.textContent = displayName;
+        editPresetSelect.appendChild(option);
+      });
+      
+      // Auto-select first preset if requested (on page load)
+      if (autoSelect && firstPresetKey) {
+        const firstBtn = presetButtonsContainer.querySelector(`[data-preset="${firstPresetKey}"]`);
+        if (firstBtn) {
+          firstBtn.classList.add('active');
+          currentPreset = firstPresetKey;
+          updateFactorSliders(firstPresetKey);
+          // Don't draw workflow yet - wait for scenario to be selected
+        }
+      }
+    }
+
+    // Function to initialize scenario UI
+    function initializeScenarioUI(autoSelect = false) {
+      const scenarioButtonsContainer = document.getElementById('scenarioButtonsContainer');
+      const editScenarioSelect = document.getElementById('editScenarioSelect');
+      
+      // Clear existing scenario buttons
+      const existingScenarioBtns = scenarioButtonsContainer.querySelectorAll('.scenario-btn');
+      existingScenarioBtns.forEach(btn => btn.remove());
+      
+      // Clear dropdown options
+      editScenarioSelect.innerHTML = '';
+      
+      // Must have a preset selected to show scenarios
+      if (!currentPreset) {
+        console.log('No preset selected, cannot show scenarios');
+        return; // No scenarios to show without a preset
+      }
+      
+      console.log('Loading scenarios for preset:', currentPreset);
+      
+      // Get scenarios for the current preset only
+      const presetScenarios = scenarioMetadata[currentPreset] || {};
+      
+      console.log('Found scenarios:', presetScenarios);
+      
+      // If no scenarios exist for this preset, create default prototyping scenario
+      if (Object.keys(presetScenarios).length === 0) {
+        console.log('No scenarios found, creating default prototyping scenario');
+        scenarioMetadata[currentPreset] = {
+          'prototyping': 'Prototyping'
+        };
+        
+        // Create default factors with all values at 50
+        const compositeKey = `${currentPreset}:prototyping`;
+        scenarioFactors[compositeKey] = {
+          importance: 50,
+          complexity: 50,
+          maturity: 50
+        };
+        
+        saveWorkflows();
+        presetScenarios['prototyping'] = 'Prototyping';
+      }
+      
+      let firstScenarioKey = null;
+      
+      // Add buttons and dropdown options for scenarios belonging to current preset
+      Object.keys(presetScenarios).forEach((scenarioKey, index) => {
+        console.log('Creating scenario button:', scenarioKey, presetScenarios[scenarioKey]);
+        if (index === 0) firstScenarioKey = scenarioKey;
+        
+        const displayName = presetScenarios[scenarioKey];
+        
+        // Create button
+        const scenarioBtn = document.createElement('button');
+        scenarioBtn.className = 'preset-btn scenario-btn';
+        scenarioBtn.dataset.scenario = scenarioKey;
+        scenarioBtn.textContent = displayName;
+        
+        // Add click handler - similar to product capabilities (single-select with toggle)
+        scenarioBtn.addEventListener('click', () => {
+          const wasActive = scenarioBtn.classList.contains('active');
+          
+          // Clear all active states
+          document.querySelectorAll('.scenario-btn').forEach(b => b.classList.remove('active'));
+          
+          if (wasActive) {
+            // Deselect - clear workflow visualization
+            currentScenario = null;
+            clearPresetVisualization();
+            updateCollapsedPanelTitle('Scenarios');
+          } else {
+            scenarioBtn.classList.add('active');
+            currentScenario = scenarioKey;
+            
+            // Update scenario factor sliders with composite key
+            updateScenarioFactorSliders(currentPreset, scenarioKey);
+            
+            // Draw workflow for currentPreset:currentScenario combination
+            drawWorkflow(currentPreset, scenarioKey);
+            
+            // Update collapsed panel title
+            updateCollapsedPanelTitle('Scenarios');
+          }
+        });
+        
+        // Add to container
+        scenarioButtonsContainer.appendChild(scenarioBtn);
+        
+        // Add to dropdown
+        const option = document.createElement('option');
+        option.value = scenarioKey;
+        option.textContent = displayName;
+        editScenarioSelect.appendChild(option);
+      });
+      
+      // Auto-select first scenario if requested (on page load) and preset is selected
+      if (autoSelect && firstScenarioKey && currentPreset) {
+        const firstBtn = scenarioButtonsContainer.querySelector(`[data-scenario="${firstScenarioKey}"]`);
+        if (firstBtn) {
+          firstBtn.classList.add('active');
+          currentScenario = firstScenarioKey;
+          updateScenarioFactorSliders(currentPreset, firstScenarioKey);
+          drawWorkflow(currentPreset, firstScenarioKey);
+        }
+      }
+    }
+    
+    // Panel collapse functionality
+    function togglePanel(panelId, btnId, panelName) {
+      const content = document.getElementById(panelId);
+      const btn = document.getElementById(btnId);
+      const header = btn.closest('.panel-header');
+      const titleSpan = header.querySelector('.panel-title');
+      
+      const isCollapsed = content.classList.contains('collapsed');
+      
+      if (isCollapsed) {
+        // Expand
+        content.classList.remove('collapsed');
+        btn.textContent = '−';
+        titleSpan.textContent = panelName;
+      } else {
+        // Collapse
+        content.classList.add('collapsed');
+        btn.textContent = '+';
+        
+        // Update title with selected item
+        const selectedItem = getSelectedItemName(panelName);
+        titleSpan.textContent = `${panelName}: ${selectedItem}`;
+      }
+    }
+    
+    function getSelectedItemName(panelName) {
+      if (panelName === 'Profile Presets') {
+        const activePresetBtn = document.querySelector('.preset-btn.active');
+        return activePresetBtn ? activePresetBtn.textContent : 'None';
+      } else if (panelName === 'Scenarios') {
+        const activeScenarioBtn = document.querySelector('.scenario-btn.active');
+        return activeScenarioBtn ? activeScenarioBtn.textContent : 'None';
+      } else if (panelName === 'Product Capabilities') {
+        const activeProductBtn = document.querySelector('.product-btn.active');
+        return activeProductBtn ? activeProductBtn.textContent : 'None';
+      }
+      return 'None';
+    }
+    
+    function updateCollapsedPanelTitle(panelName) {
+      let headerId, contentId;
+      
+      if (panelName === 'Profile Presets') {
+        headerId = 'presetPanelHeader';
+        contentId = 'presetPanelContent';
+      } else if (panelName === 'Scenarios') {
+        headerId = 'scenarioPanelHeader';
+        contentId = 'scenarioPanelContent';
+      } else if (panelName === 'Product Capabilities') {
+        headerId = 'productPanelHeader';
+        contentId = 'productPanelContent';
+      }
+      
+      const header = document.getElementById(headerId);
+      const content = document.getElementById(contentId);
+      const titleSpan = header.querySelector('.panel-title');
+      
+      // Only update if panel is collapsed
+      if (content.classList.contains('collapsed')) {
+        const selectedItem = getSelectedItemName(panelName);
+        titleSpan.textContent = `${panelName}: ${selectedItem}`;
+      }
+    }
+    
+    // Add event listeners for collapse buttons
+    document.getElementById('presetCollapseBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePanel('presetPanelContent', 'presetCollapseBtn', 'Profile Presets');
+    });
+    
+    document.getElementById('scenarioCollapseBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePanel('scenarioPanelContent', 'scenarioCollapseBtn', 'Scenarios');
+    });
+    
+    document.getElementById('productCollapseBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePanel('productPanelContent', 'productCollapseBtn', 'Product Capabilities');
+    });
+    
+    // Allow clicking on header to toggle as well
+    document.getElementById('presetPanelHeader').addEventListener('click', () => {
+      togglePanel('presetPanelContent', 'presetCollapseBtn', 'Profile Presets');
+    });
+    
+    document.getElementById('productPanelHeader').addEventListener('click', () => {
+      togglePanel('productPanelContent', 'productCollapseBtn', 'Product Capabilities');
+    });
+    
+    // Initialize UIs on page load
+    initializePresetUI(true); // Auto-select first preset
+    initializeScenarioUI(true); // Auto-select first scenario
+    initializeProductUI();
+
+    // Preset button event handlers are now added dynamically in initializePresetUI
+
+    // Preset edit mode
+    // Preset edit mode
+    let presetEditMode = false;
+    let tempPresetSelections = [];
+    
+    const presetEditToggle = document.getElementById('presetEditToggle');
+    const editPresetSelect = document.getElementById('editPresetSelect');
+    const addPresetBtn = document.getElementById('addPresetBtn');
+    const deletePresetBtn = document.getElementById('deletePresetBtn');
+    const renamePresetBtn = document.getElementById('renamePresetBtn');
+    const presetEditInfo = document.getElementById('presetEditInfo');
+    
+    presetEditToggle.addEventListener('click', () => {
+      if (!presetEditMode) {
+        enterPresetEditMode();
+      } else {
+        // Save on exit
+        savePresets();
+        exitPresetEditMode();
+      }
+    });
+    
+    editPresetSelect.addEventListener('change', () => {
+      if (presetEditMode) {
+        loadExistingPresetSelections();
+        
+        // Load preset factors when switching presets in edit mode
+        const selectedPreset = editPresetSelect.value;
+        if (selectedPreset) {
+          updateFactorSliders(selectedPreset);
+        }
+      }
+    });
+    
+    deletePresetBtn.addEventListener('click', () => {
+      const selectedPreset = editPresetSelect.value;
+      const presetName = editPresetSelect.options[editPresetSelect.selectedIndex].text;
+      
+      if (selectedPreset && confirm(`Are you sure you want to permanently delete "${presetName}"? This will remove the preset and ALL its workflows and scenario factors.`)) {
+        // Remove from presets object
+        delete presets[selectedPreset];
+        
+        // Remove from presetFactors object
+        delete presetFactors[selectedPreset];
+        
+        // Remove from presetMetadata object
+        delete presetMetadata[selectedPreset];
+        
+        // Remove all scenario metadata for this preset
+        delete scenarioMetadata[selectedPreset];
+        
+        // Remove all scenario factors for this preset (composite keys)
+        Object.keys(scenarioFactors).forEach(factorKey => {
+          if (factorKey.startsWith(`${selectedPreset}:`)) {
+            delete scenarioFactors[factorKey];
+          }
+        });
+        
+        // Remove all workflows for this preset
+        Object.keys(workflows).forEach(workflowKey => {
+          if (workflowKey.startsWith(`${selectedPreset}:`)) {
+            delete workflows[workflowKey];
+          }
+        });
+        
+        // Save to localStorage
+        savePresets();
+        saveWorkflows(); // Also save workflows and scenario factors
+        
+        // Reinitialize UI
+        initializePresetUI();
+        
+        // Clear the visualization
+        clearPresetEditSelections();
+        tempPresetSelections = [];
+        
+        // If dropdown has options, select the first one and load its factors
+        if (editPresetSelect.options.length > 0) {
+          editPresetSelect.selectedIndex = 0;
+          const newSelectedPreset = editPresetSelect.value;
+          if (newSelectedPreset) {
+            updateFactorSliders(newSelectedPreset);
+          }
+        } else {
+          // No presets left, exit edit mode
+          exitPresetEditMode();
+        }
+        
+        alert(`Preset "${presetName}" has been permanently deleted.`);
+      }
+    });
+    
+    renamePresetBtn.addEventListener('click', () => {
+      const selectedPreset = editPresetSelect.value;
+      const currentName = editPresetSelect.options[editPresetSelect.selectedIndex].text;
+      
+      if (selectedPreset) {
+        const newName = prompt(`Enter a new name for "${currentName}":`, currentName);
+        if (!newName || newName.trim() === '' || newName === currentName) {
+          return;
+        }
+        
+        // Update the metadata with the new display name
+        presetMetadata[selectedPreset] = newName.trim();
+        
+        // Save to localStorage
+        savePresets();
+        
+        // Reinitialize UI to show the new name
+        initializePresetUI();
+        
+        // Reselect the renamed preset in dropdown
+        if (presetEditMode) {
+          editPresetSelect.value = selectedPreset;
+          loadExistingPresetSelections();
+        }
+        
+        alert(`Preset renamed to "${newName.trim()}"`);
+      }
+    });
+    
+    addPresetBtn.addEventListener('click', () => {
+      const presetName = prompt('Enter a name for the new preset:');
+      if (!presetName || presetName.trim() === '') {
+        return;
+      }
+      
+      // Create a key from the preset name (lowercase, replace spaces with dashes)
+      const presetKey = presetName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      
+      // Check if preset already exists by key
+      if (presets[presetKey]) {
+        alert('A preset with this name already exists. Please choose a different name.');
+        return;
+      }
+      
+      // Check if preset name already exists in metadata (case-insensitive)
+      const normalizedNewName = presetName.trim().toLowerCase();
+      const existingNames = Object.values(presetMetadata).map(name => name.toLowerCase());
+      if (existingNames.includes(normalizedNewName)) {
+        alert('A preset with this name already exists. Please choose a different name.');
+        return;
+      }
+      
+      // Create new preset with empty workflow and default factors (only 3 now)
+      presets[presetKey] = [];
+      presetFactors[presetKey] = {
+        expertise: 50,
+        aicapability: 50,
+        governance: 50
+      };
+      presetMetadata[presetKey] = presetName;
+      
+      // EVERY new preset gets a default "Prototyping" scenario with factors=50
+      scenarioMetadata[presetKey] = {
+        'prototyping': 'Prototyping'
+      };
+      
+      const compositeKey = `${presetKey}:prototyping`;
+      scenarioFactors[compositeKey] = {
+        importance: 50,
+        complexity: 50,
+        maturity: 50
+      };
+      
+      // Save to localStorage
+      savePresets();
+      saveWorkflows(); // Also save scenario metadata and factors
+      
+      // Reinitialize UI to show new preset
+      initializePresetUI();
+      
+      // Select the new preset in dropdown (if in edit mode)
+      if (presetEditMode) {
+        editPresetSelect.value = presetKey;
+      }
+      
+      alert(`Preset "${presetName}" has been created. Select a scenario to begin defining workflows.`);
+    });
+
+    // Scenario edit mode
+    let scenarioEditMode = false;
+    let tempScenarioSelections = [];
+    
+    const scenarioEditToggle = document.getElementById('scenarioEditToggle');
+    const editScenarioSelect = document.getElementById('editScenarioSelect');
+    const addScenarioBtn = document.getElementById('addScenarioBtn');
+    const deleteScenarioBtn = document.getElementById('deleteScenarioBtn');
+    const renameScenarioBtn = document.getElementById('renameScenarioBtn');
+    const scenarioEditInfo = document.getElementById('scenarioEditInfo');
+    
+    scenarioEditToggle.addEventListener('click', () => {
+      if (!scenarioEditMode) {
+        enterScenarioEditMode();
+      } else {
+        // Save on exit
+        if (currentPreset) {
+          saveWorkflows();
+        }
+        exitScenarioEditMode();
+      }
+    });
+    
+    editScenarioSelect.addEventListener('change', () => {
+      if (scenarioEditMode) {
+        loadExistingScenarioSelections();
+        
+        // Load scenario factors when switching scenarios in edit mode
+        const selectedScenario = editScenarioSelect.value;
+        if (selectedScenario && currentPreset) {
+          updateScenarioFactorSliders(currentPreset, selectedScenario);
+        }
+      }
+    });
+    
+    deleteScenarioBtn.addEventListener('click', () => {
+      if (!currentPreset) {
+        alert('Please select a Profile Preset first.');
+        return;
+      }
+      
+      const selectedScenario = editScenarioSelect.value;
+      const scenarioName = editScenarioSelect.options[editScenarioSelect.selectedIndex].text;
+      
+      // Check if this is the last scenario for the preset
+      const presetScenarios = scenarioMetadata[currentPreset] || {};
+      const scenarioCount = Object.keys(presetScenarios).length;
+      
+      if (scenarioCount <= 1) {
+        alert('Cannot delete the last scenario. Every preset must have at least one scenario.');
+        return;
+      }
+      
+      if (selectedScenario && confirm(`Are you sure you want to permanently delete "${scenarioName}" from preset "${presetMetadata[currentPreset]}"?`)) {
+        // Delete scenario from current preset only
+        delete scenarioMetadata[currentPreset][selectedScenario];
+        
+        // Delete scenario factors for this preset:scenario combination
+        const compositeKey = `${currentPreset}:${selectedScenario}`;
+        delete scenarioFactors[compositeKey];
+        
+        // Delete workflow for this preset:scenario combination
+        delete workflows[compositeKey];
+        
+        saveWorkflows();
+        initializeScenarioUI();
+        
+        clearPresetEditSelections();
+        tempScenarioSelections = [];
+        
+        if (editScenarioSelect.options.length > 0) {
+          editScenarioSelect.selectedIndex = 0;
+          loadExistingScenarioSelections();
+          // Load factors for the newly selected scenario
+          const newSelectedScenario = editScenarioSelect.value;
+          if (newSelectedScenario && currentPreset) {
+            updateScenarioFactorSliders(currentPreset, newSelectedScenario);
+          }
+        } else {
+          exitScenarioEditMode();
+        }
+        
+        alert(`Scenario "${scenarioName}" has been deleted from preset "${presetMetadata[currentPreset]}".`);
+      }
+    });
+    
+    renameScenarioBtn.addEventListener('click', () => {
+      if (!currentPreset) {
+        alert('Please select a Profile Preset first.');
+        return;
+      }
+      
+      const selectedScenario = editScenarioSelect.value;
+      const currentName = editScenarioSelect.options[editScenarioSelect.selectedIndex].text;
+      
+      if (selectedScenario) {
+        const newName = prompt(`Enter a new name for "${currentName}":`, currentName);
+        if (!newName || newName.trim() === '' || newName === currentName) {
+          return;
+        }
+        
+        // Update scenario name in current preset's scenario list
+        scenarioMetadata[currentPreset][selectedScenario] = newName.trim();
+        saveWorkflows();
+        initializeScenarioUI();
+        
+        if (scenarioEditMode) {
+          editScenarioSelect.value = selectedScenario;
+          loadExistingScenarioSelections();
+        }
+        
+        alert(`Scenario renamed to "${newName.trim()}"`);
+      }
+    });
+    
+    addScenarioBtn.addEventListener('click', () => {
+      if (!currentPreset) {
+        alert('Please select a Profile Preset first before adding a scenario.');
+        return;
+      }
+      
+      const scenarioName = prompt('Enter a name for the new scenario:');
+      if (!scenarioName || scenarioName.trim() === '') {
+        return;
+      }
+      
+      const scenarioKey = scenarioName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      
+      // Check if scenario already exists for this preset (by key)
+      const presetScenarios = scenarioMetadata[currentPreset] || {};
+      if (presetScenarios[scenarioKey]) {
+        alert('A scenario with this name already exists for this preset. Please choose a different name.');
+        return;
+      }
+      
+      // Check if scenario name already exists for this preset (case-insensitive)
+      const normalizedNewName = scenarioName.trim().toLowerCase();
+      const existingScenarioNames = Object.values(presetScenarios).map(name => name.toLowerCase());
+      if (existingScenarioNames.includes(normalizedNewName)) {
+        alert('A scenario with this name already exists for this preset. Please choose a different name.');
+        return;
+      }
+      
+      // Add scenario to current preset only
+      if (!scenarioMetadata[currentPreset]) {
+        scenarioMetadata[currentPreset] = {};
+      }
+      scenarioMetadata[currentPreset][scenarioKey] = scenarioName;
+      
+      // Create default scenario factors for this preset:scenario combination
+      const compositeKey = `${currentPreset}:${scenarioKey}`;
+      scenarioFactors[compositeKey] = {
+        importance: 50,
+        complexity: 50,
+        maturity: 50
+      };
+      
+      saveWorkflows();
+      initializeScenarioUI();
+      
+      if (scenarioEditMode) {
+        editScenarioSelect.value = scenarioKey;
+        loadExistingScenarioSelections();
+        // Load factors for the newly created scenario
+        updateScenarioFactorSliders(currentPreset, scenarioKey);
+      }
+      
+      alert(`Scenario "${scenarioName}" has been created for preset "${presetMetadata[currentPreset]}".`);
+    });
+    
+    function enterPresetEditMode() {
+      presetEditMode = true;
+      
+      // Update UI
+      presetEditToggle.textContent = 'Exit';
+      presetEditToggle.classList.add('active');
+      editPresetSelect.style.display = 'inline';
+      addPresetBtn.style.display = 'inline';
+      renamePresetBtn.style.display = 'inline';
+      deletePresetBtn.style.display = 'inline';
+      presetEditInfo.style.display = 'block';
+      
+      // Disable preset buttons
+      document.querySelectorAll('.preset-btn').forEach(b => b.disabled = true);
+      
+      // Add factor slider click handlers (presets only have factor editing now, no workflow)
+      addFactorSliderClickHandlers('preset');
+      
+      // Load preset factors for the currently selected preset in the dropdown
+      const selectedPreset = editPresetSelect.value;
+      if (selectedPreset) {
+        updateFactorSliders(selectedPreset);
+      }
+    }
+    
+    function exitPresetEditMode() {
+      presetEditMode = false;
+      
+      // Update UI
+      presetEditToggle.textContent = 'Edit';
+      presetEditToggle.classList.remove('active');
+      editPresetSelect.style.display = 'none';
+      addPresetBtn.style.display = 'none';
+      renamePresetBtn.style.display = 'none';
+      deletePresetBtn.style.display = 'none';
+      presetEditInfo.style.display = 'none';
+      
+      // Enable preset buttons
+      document.querySelectorAll('.preset-btn').forEach(b => b.disabled = false);
+      
+      // Remove factor slider click handlers
+      removeFactorSliderClickHandlers('preset');
+    }
+    
+    function addFactorSliderClickHandlers(context) {
+      let factorNames, idPrefix, dataStructure, selectElement;
+      
+      if (context === 'preset') {
+        factorNames = ['expertise', 'aicapability', 'governance'];
+        idPrefix = 'bar-';
+        dataStructure = presetFactors;
+        selectElement = editPresetSelect;
+      } else if (context === 'scenario') {
+        factorNames = ['importance', 'complexity', 'maturity'];
+        idPrefix = 'bar-scenario-';
+        dataStructure = scenarioFactors;
+        selectElement = editScenarioSelect;
+      }
+      
+      factorNames.forEach(name => {
+        const barElement = document.getElementById(`${idPrefix}${name}`);
+        if (!barElement) return;
+        const barContainer = barElement.parentElement;
+        if (!barContainer) return;
+        
+        barContainer.style.cursor = 'pointer';
+        if (barContainer._factorClickHandler) {
+          barContainer.removeEventListener('click', barContainer._factorClickHandler);
+        }
+        const clickHandler = function(event) {
+          handleFactorSliderClick(event, context, dataStructure, selectElement, name);
+        };
+        barContainer._factorClickHandler = clickHandler;
+        barContainer.addEventListener('click', clickHandler);
+        barContainer.dataset.factor = name;
+        barContainer.dataset.context = context;
+
+        const inputId = context === 'preset' ? `input-${name}` : `input-scenario-${name}`;
+        const input = document.getElementById(inputId);
+        if (input) {
+          input.disabled = false;
+          input.style.display = 'inline-block';
+          if (input._factorInputHandler) {
+            input.removeEventListener('input', input._factorInputHandler);
+            input.removeEventListener('change', input._factorInputHandler);
+          }
+          const inputHandler = function(event) {
+            handleFactorInputChange(event, context, dataStructure, selectElement, name);
+          };
+          input._factorInputHandler = inputHandler;
+          input.addEventListener('input', inputHandler);
+          input.addEventListener('change', inputHandler);
+        }
+      });
+    }
+    
+    function removeFactorSliderClickHandlers(context) {
+      let factorNames, idPrefix;
+      
+      if (context === 'preset') {
+        factorNames = ['expertise', 'aicapability', 'governance'];
+        idPrefix = 'bar-';
+      } else if (context === 'scenario') {
+        factorNames = ['importance', 'complexity', 'maturity'];
+        idPrefix = 'bar-scenario-';
+      }
+      
+      factorNames.forEach(name => {
+        const barElement = document.getElementById(`${idPrefix}${name}`);
+        if (!barElement) return;
+        const barContainer = barElement.parentElement;
+        if (!barContainer) return;
+
+        barContainer.style.cursor = 'default';
+        if (barContainer._factorClickHandler) {
+          barContainer.removeEventListener('click', barContainer._factorClickHandler);
+          delete barContainer._factorClickHandler;
+        }
+        delete barContainer.dataset.factor;
+        delete barContainer.dataset.context;
+
+        const inputId = context === 'preset' ? `input-${name}` : `input-scenario-${name}`;
+        const input = document.getElementById(inputId);
+        if (input) {
+          input.disabled = true;
+          input.style.display = 'none';
+          if (input._factorInputHandler) {
+            input.removeEventListener('input', input._factorInputHandler);
+            input.removeEventListener('change', input._factorInputHandler);
+            delete input._factorInputHandler;
+          }
+        }
+      });
+    }
+    
+    function handleFactorSliderClick(event, context, dataStructure, selectElement, factorName) {
+      const selectedKey = selectElement.value;
+      if (!selectedKey) return;
+      
+      // For scenarios, we need to use composite key "preset:scenario"
+      let lookupKey = selectedKey;
+      if (context === 'scenario') {
+        if (!currentPreset) return;
+        lookupKey = `${currentPreset}:${selectedKey}`;
+      }
+      
+      // Ensure the key exists in the data structure
+      if (!dataStructure[lookupKey]) {
+        // Initialize if doesn't exist (for scenarios, create default values)
+        if (context === 'scenario') {
+          dataStructure[lookupKey] = {
+            importance: 50,
+            complexity: 50,
+            maturity: 50
+          };
+        } else {
+          return;
+        }
+      }
+      
+      const barContainer = event.currentTarget;
+      const rect = barContainer.getBoundingClientRect();
+      
+      // Calculate percentage based on click position (inverted because bars fill from bottom)
+      const clickY = event.clientY - rect.top;
+      const containerHeight = rect.height;
+      const percentage = Math.max(0, Math.min(100, Math.round((1 - clickY / containerHeight) * 100)));
+      
+      // Update the factor value
+      dataStructure[lookupKey][factorName] = percentage;
+      
+      // Update the visual display
+      const idPrefix = context === 'preset' ? 'bar-' : 'bar-scenario-';
+      updateSingleFactorSlider(`${idPrefix}${factorName}`, percentage);
+    }
+    
+    function handleFactorInputChange(event, context, dataStructure, selectElement, factorName) {
+      const selectedKey = selectElement.value;
+      if (!selectedKey) return;
+
+      let lookupKey = selectedKey;
+      if (context === 'scenario') {
+        if (!currentPreset) return;
+        lookupKey = `${currentPreset}:${selectedKey}`;
+      }
+
+      if (!dataStructure[lookupKey]) {
+        if (context === 'scenario') {
+          dataStructure[lookupKey] = {
+            importance: 50,
+            complexity: 50,
+            maturity: 50
+          };
+        } else {
+          return;
+        }
+      }
+
+      let rawValue = event.target.value;
+      
+      // Allow empty value (treat as 0)
+      if (rawValue === '') {
+        dataStructure[lookupKey][factorName] = 0;
+        const idPrefix = context === 'preset' ? 'bar-' : 'bar-scenario-';
+        updateSingleFactorSlider(`${idPrefix}${factorName}`, 0);
+        return;
+      }
+
+      let value = parseInt(rawValue, 10);
+      if (Number.isNaN(value)) {
+        return;
+      }
+
+      value = Math.max(0, Math.min(100, value));
+      if (value.toString() !== rawValue.trim()) {
+        event.target.value = value;
+      }
+
+      dataStructure[lookupKey][factorName] = value;
+
+      const idPrefix = context === 'preset' ? 'bar-' : 'bar-scenario-';
+      updateSingleFactorSlider(`${idPrefix}${factorName}`, value);
+    }
+    
+    function updateSingleFactorSlider(barId, value) {
+      const bar = document.getElementById(barId);
+      const valueDisplayId = barId.replace('bar-', 'value-');
+      const valueDisplay = document.getElementById(valueDisplayId);
+      const inputId = valueDisplayId.replace('value-', 'input-');
+      const input = document.getElementById(inputId);
+      
+      if (bar && valueDisplay) {
+        bar.style.height = value + '%';
+        valueDisplay.textContent = value;
+        if (input) {
+          input.value = value;
+        }
+      }
+    }
+
+    // Scenario edit mode functions
+    function enterScenarioEditMode() {
+      // Must have a preset selected to edit scenario workflows
+      if (!currentPreset) {
+        alert('Please select a Profile Preset first before editing scenario workflows.');
+        return;
+      }
+      
+      scenarioEditMode = true;
+      tempScenarioSelections = [];
+      
+      clearPresetVisualization();
+      
+      scenarioEditToggle.textContent = 'Exit';
+      scenarioEditToggle.classList.add('active');
+      editScenarioSelect.style.display = 'inline';
+      addScenarioBtn.style.display = 'inline';
+      renameScenarioBtn.style.display = 'inline';
+      deleteScenarioBtn.style.display = 'inline';
+      scenarioEditInfo.style.display = 'block';
+      
+      document.querySelectorAll('.scenario-btn').forEach(b => b.disabled = true);
+      
+      addScenarioEditClickHandlers();
+      addFactorSliderClickHandlers('scenario');
+      
+      loadExistingScenarioSelections();
+      
+      // Load scenario factors for the currently selected scenario in the dropdown
+      const selectedScenario = editScenarioSelect.value;
+      if (selectedScenario && currentPreset) {
+        updateScenarioFactorSliders(currentPreset, selectedScenario);
+      }
+    }
+    
+    function exitScenarioEditMode() {
+      scenarioEditMode = false;
+      
+      // Save workflow selections if a scenario is selected
+      const selectedScenario = editScenarioSelect.value;
+      if (selectedScenario && currentPreset) {
+        const workflowKey = `${currentPreset}:${selectedScenario}`;
+        workflows[workflowKey] = tempScenarioSelections.map(cell => {
+          const role = table.rows[cell.parentNode.rowIndex].cells[0].textContent;
+          const focus = table.rows[0].cells[cell.cellIndex].textContent;
+          return [role, focus];
+        });
+        saveWorkflows();
+        
+        // Refresh the scenario UI to show updated workflow
+        initializeScenarioUI();
+      }
+      
+      scenarioEditToggle.textContent = 'Edit';
+      scenarioEditToggle.classList.remove('active');
+      editScenarioSelect.style.display = 'none';
+      addScenarioBtn.style.display = 'none';
+      renameScenarioBtn.style.display = 'none';
+      deleteScenarioBtn.style.display = 'none';
+      scenarioEditInfo.style.display = 'none';
+      
+      document.querySelectorAll('.scenario-btn').forEach(b => b.disabled = false);
+      
+      clearPresetEditSelections();
+      tempScenarioSelections = [];
+      
+      removeScenarioEditClickHandlers();
+      removeFactorSliderClickHandlers('scenario');
+      
+      // Restore scenario factors for the currently selected scenario button (if any)
+      if (currentScenario && currentPreset) {
+        updateScenarioFactorSliders(currentPreset, currentScenario);
+      }
+    }
+    
+    function addScenarioEditClickHandlers() {
+      for (let row of table.rows) {
+        for (let cell of row.cells) {
+          if (cell.cellIndex === 0 || row.rowIndex === 0) continue;
+          cell.addEventListener('click', handleScenarioEditCellClick);
+        }
+      }
+    }
+    
+    function removeScenarioEditClickHandlers() {
+      for (let row of table.rows) {
+        for (let cell of row.cells) {
+          if (cell.cellIndex === 0 || row.rowIndex === 0) continue;
+          cell.removeEventListener('click', handleScenarioEditCellClick);
+        }
+      }
+    }
+    
+    function handleScenarioEditCellClick(event) {
+      if (!scenarioEditMode) return;
+      
+      const cell = event.currentTarget;
+      const index = tempScenarioSelections.indexOf(cell);
+      
+      if (index > -1) {
+        tempScenarioSelections.splice(index);
+      } else {
+        tempScenarioSelections.push(cell);
+      }
+      
+      visualizeScenarioEdit();
+    }
+    
+    function loadExistingScenarioSelections() {
+      tempScenarioSelections = [];
+      clearPresetEditSelections();
+      
+      const selectedScenario = editScenarioSelect.value;
+      if (!selectedScenario || !currentPreset) return;
+      
+      // Load workflow using composite key "preset:scenario"
+      const workflowKey = `${currentPreset}:${selectedScenario}`;
+      const workflow = workflows[workflowKey] || [];
+      workflow.forEach(([role, focus]) => {
+        const cell = findCell(role, focus);
+        if (cell) {
+          tempScenarioSelections.push(cell);
+        }
+      });
+      
+      visualizeScenarioEdit();
+    }
+    
+    function visualizeScenarioEdit() {
+      console.log('visualizeScenarioEdit called, tempScenarioSelections:', tempScenarioSelections.length);
+      clearPresetEditSelections();
+      
+      tempScenarioSelections.forEach((cell, index) => {
+        cell.classList.add('preset-selected');
+        
+        const dot = document.createElement('div');
+        dot.className = 'preset-dot';
+        dot.textContent = index + 1;
+        
+        const cellRect = cell.getBoundingClientRect();
+        const tableRect = table.getBoundingClientRect();
+        
+        const x = cellRect.left - tableRect.left + cellRect.width / 2;
+        const y = cellRect.top - tableRect.top + cellRect.height / 2;
+        
+        dot.style.left = (x - 10) + 'px';
+        dot.style.top = (y - 10) + 'px';
+        
+        table.parentElement.appendChild(dot);
+      });
+      
+      if (tempScenarioSelections.length > 1) {
+        console.log('Drawing lines for', tempScenarioSelections.length, 'points');
+        resizeCanvas();
+        presetCtx.clearRect(0, 0, presetCanvas.width, presetCanvas.height);
+        presetCtx.strokeStyle = '#9b59b6';
+        presetCtx.lineWidth = 3;
+        presetCtx.setLineDash([5, 5]);
+        presetCtx.lineCap = 'round';
+        presetCtx.lineJoin = 'round';
+        
+        const points = tempScenarioSelections.map(cell => {
+          const cellRect = cell.getBoundingClientRect();
+          const tableRect = table.getBoundingClientRect();
+          return {
+            x: cellRect.left - tableRect.left + cellRect.width / 2,
+            y: cellRect.top - tableRect.top + cellRect.height / 2
+          };
+        });
+        
+        console.log('Points:', points);
+        
+        for (let i = 0; i < points.length - 1; i++) {
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          const curvature = Math.min(distance * 0.3, 50);
+          
+          const perpX = -dy / distance;
+          const perpY = dx / distance;
+          
+          const controlX = (p1.x + p2.x) / 2 + perpX * curvature;
+          const controlY = (p1.y + p2.y) / 2 + perpY * curvature;
+          
+          console.log(`Drawing curve from (${p1.x}, ${p1.y}) to (${p2.x}, ${p2.y})`);
+          presetCtx.beginPath();
+          presetCtx.moveTo(p1.x, p1.y);
+          presetCtx.quadraticCurveTo(controlX, controlY, p2.x, p2.y);
+          presetCtx.stroke();
+        }
+      } else {
+        console.log('Not enough selections to draw lines:', tempScenarioSelections.length);
+      }
+    }
+    
+    function addPresetEditClickHandlers() {
+      for (let row of table.rows) {
+        for (let cell of row.cells) {
+          if (cell.cellIndex === 0 || row.rowIndex === 0) continue;
+          cell.addEventListener('click', handlePresetEditCellClick);
+        }
+      }
+    }
+    
+    function removePresetEditClickHandlers() {
+      for (let row of table.rows) {
+        for (let cell of row.cells) {
+          if (cell.cellIndex === 0 || row.rowIndex === 0) continue;
+          cell.removeEventListener('click', handlePresetEditCellClick);
+        }
+      }
+    }
+    
+    function handlePresetEditCellClick(event) {
+      if (!presetEditMode) return;
+      
+      const cell = event.currentTarget;
+      const index = tempPresetSelections.indexOf(cell);
+      
+      if (index > -1) {
+        // Remove this cell and all subsequent cells
+        tempPresetSelections.splice(index);
+      } else {
+        // Add to sequence
+        tempPresetSelections.push(cell);
+      }
+      
+      // Redraw
+      visualizePresetEdit();
+    }
+    
+    function loadExistingPresetSelections() {
+      tempPresetSelections = [];
+      clearPresetEditSelections();
+      
+      const selectedPreset = editPresetSelect.value;
+      const workflow = presets[selectedPreset] || [];
+      
+      workflow.forEach(([role, focus]) => {
+        const cell = findCell(role, focus);
+        if (cell) {
+          tempPresetSelections.push(cell);
+        }
+      });
+      
+      visualizePresetEdit();
+    }
+    
+    function visualizePresetEdit() {
+      clearPresetEditSelections();
+      
+      if (tempPresetSelections.length === 0) return;
+
+      const points = [];
+      
+      tempPresetSelections.forEach((cell, index) => {
+        cell.classList.add('preset-selected');
+        
+        // Create numbered dot
+        const dot = document.createElement('div');
+        dot.className = 'preset-dot';
+        dot.textContent = index + 1;
+        
+        const cellRect = cell.getBoundingClientRect();
+        const tableRect = table.getBoundingClientRect();
+        
+        const x = cellRect.left - tableRect.left + cellRect.width / 2;
+        const y = cellRect.top - tableRect.top + cellRect.height / 2;
+        
+        dot.style.left = (x - 10) + 'px';
+        dot.style.top = (y - 10) + 'px';
+        
+        table.parentElement.appendChild(dot);
+        points.push({ x, y });
+      });
+
+      // Draw connecting lines
+      if (points.length > 1) {
+        resizeCanvas();
+        presetCtx.clearRect(0, 0, presetCanvas.width, presetCanvas.height);
+        presetCtx.strokeStyle = '#9b59b6';
+        presetCtx.lineWidth = 3;
+        presetCtx.setLineDash([5, 5]);
+        presetCtx.lineCap = 'round';
+        presetCtx.lineJoin = 'round';
+
+        // Draw curved lines between points
+        for (let i = 0; i < points.length - 1; i++) {
+          const p1 = points[i];
+          const p2 = points[i + 1];
+          
+          // Calculate control points for quadratic curve
+          const dx = p2.x - p1.x;
+          const dy = p2.y - p1.y;
+          const distance = Math.sqrt(dx * dx + dy * dy);
+          
+          // Create a curve that bends perpendicular to the line
+          // The amount of curve is proportional to the distance
+          const curvature = Math.min(distance * 0.3, 50);
+          
+          // Calculate perpendicular direction
+          const perpX = -dy / distance;
+          const perpY = dx / distance;
+          
+          // Control point is offset perpendicular to the line
+          const controlX = (p1.x + p2.x) / 2 + perpX * curvature;
+          const controlY = (p1.y + p2.y) / 2 + perpY * curvature;
+          
+          presetCtx.beginPath();
+          presetCtx.moveTo(p1.x, p1.y);
+          presetCtx.quadraticCurveTo(controlX, controlY, p2.x, p2.y);
+          presetCtx.stroke();
+        }
+      }
+    }
+    
+    function clearPresetEditSelections() {
+      presetCtx.clearRect(0, 0, presetCanvas.width, presetCanvas.height);
+      document.querySelectorAll('.preset-dot').forEach(dot => dot.remove());
+      document.querySelectorAll('td.preset-selected').forEach(cell => cell.classList.remove('preset-selected'));
+    }
+
+    // Edit mode functionality
+    let editMode = false;
+    let tempSelections = [];
+    
+    const editToggle = document.getElementById('editModeToggle');
+    const editProductSelect = document.getElementById('editProductSelect');
+    const resetBtn = document.getElementById('resetBtn');
+    const editModeInfo = document.getElementById('editModeInfo');
+    
+    editToggle.addEventListener('click', () => {
+      if (!editMode) {
+        enterEditMode();
+      } else {
+        // Save on exit
+        const selectedProduct = editProductSelect.value;
+        if (selectedProduct) {
+          // Convert temp selections to product capability format
+          productCapabilities[selectedProduct] = tempSelections.map(cell => {
+            const role = table.rows[cell.parentNode.rowIndex].cells[0].textContent;
+            const focus = table.rows[0].cells[cell.cellIndex].textContent;
+            return [role, focus];
+          });
+          // Save to localStorage
+          saveProductCapabilities();
+        }
+        exitEditMode();
+      }
+    });
+    
+    editProductSelect.addEventListener('change', () => {
+      if (editMode) {
+        loadExistingSelections();
+      }
+    });
+    
+    deleteProductBtn.addEventListener('click', () => {
+      const selectedProduct = editProductSelect.value;
+      const productName = editProductSelect.options[editProductSelect.selectedIndex].text;
+      
+      if (selectedProduct && confirm(`Are you sure you want to permanently delete "${productName}"? This will remove the product completely from the system.`)) {
+        // Remove from productCapabilities object
+        delete productCapabilities[selectedProduct];
+        
+        // Remove from productMetadata object
+        delete productMetadata[selectedProduct];
+        
+        // Save to localStorage
+        saveProductCapabilities();
+        
+        // Reinitialize UI
+        initializeProductUI();
+        
+        // Clear the selections
+        document.querySelectorAll('td.selected-for-edit').forEach(cell => {
+          cell.classList.remove('selected-for-edit');
+        });
+        tempSelections = [];
+        
+        // If dropdown has options, select the first one
+        if (editProductSelect.options.length > 0) {
+          editProductSelect.selectedIndex = 0;
+          loadExistingSelections();
+        } else {
+          // No products left, exit edit mode
+          exitEditMode();
+        }
+        
+        alert(`Product "${productName}" has been permanently deleted.`);
+      }
+    });
+    
+    renameProductBtn.addEventListener('click', () => {
+      const selectedProduct = editProductSelect.value;
+      const currentName = editProductSelect.options[editProductSelect.selectedIndex].text;
+      
+      if (selectedProduct) {
+        const newName = prompt(`Enter a new name for "${currentName}":`, currentName);
+        if (!newName || newName.trim() === '' || newName === currentName) {
+          return;
+        }
+        
+        // Update the metadata with the new display name
+        productMetadata[selectedProduct] = newName.trim();
+        
+        // Save to localStorage
+        saveProductCapabilities();
+        
+        // Reinitialize UI to show the new name
+        initializeProductUI();
+        
+        // Reselect the renamed product in dropdown
+        if (editMode) {
+          editProductSelect.value = selectedProduct;
+          loadExistingSelections();
+        }
+        
+        alert(`Product renamed to "${newName.trim()}"`);
+      }
+    });
+    
+    addProductBtn.addEventListener('click', () => {
+      const productName = prompt('Enter a name for the new product:');
+      if (!productName || productName.trim() === '') {
+        return;
+      }
+      
+      // Create a key from the product name (lowercase, replace spaces with dashes)
+      const productKey = productName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      
+      // Check if product already exists
+      if (productCapabilities[productKey]) {
+        alert('A product with this name already exists. Please choose a different name.');
+        return;
+      }
+      
+      // Create new product with empty capabilities
+      productCapabilities[productKey] = [];
+      productMetadata[productKey] = productName;
+      
+      // Save to localStorage
+      saveProductCapabilities();
+      
+      // Reinitialize UI to show new product
+      initializeProductUI();
+      
+      // Select the new product in dropdown (if in edit mode)
+      if (editMode) {
+        editProductSelect.value = productKey;
+        loadExistingSelections();
+      }
+    });
+    
+    function enterEditMode() {
+      editMode = true;
+      tempSelections = [];
+      
+      // Update UI
+      editToggle.textContent = 'Exit';
+      editToggle.classList.add('active');
+      editProductSelect.style.display = 'inline';
+      addProductBtn.style.display = 'inline';
+      renameProductBtn.style.display = 'inline';
+      deleteProductBtn.style.display = 'inline';
+      editModeInfo.style.display = 'block';
+      document.body.classList.add('edit-mode');
+      
+      // Clear existing highlights
+      document.querySelectorAll('.product-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('td.highlighted').forEach(cell => cell.classList.remove('highlighted'));
+      
+      // Add click handlers to cells
+      addEditClickHandlers();
+      
+      // Load existing selections for the currently selected product
+      loadExistingSelections();
+    }
+    
+    function exitEditMode() {
+      editMode = false;
+      
+      // Update UI
+      editToggle.textContent = 'Edit';
+      editToggle.classList.remove('active');
+      editProductSelect.style.display = 'none';
+      addProductBtn.style.display = 'none';
+      renameProductBtn.style.display = 'none';
+      deleteProductBtn.style.display = 'none';
+      editModeInfo.style.display = 'none';
+      document.body.classList.remove('edit-mode');
+      
+      // Clear temp selections
+      document.querySelectorAll('td.selected-for-edit').forEach(cell => {
+        cell.classList.remove('selected-for-edit');
+      });
+      tempSelections = [];
+      
+      // Remove edit click handlers
+      removeEditClickHandlers();
+    }
+    
+    function addEditClickHandlers() {
+      for (let row of table.rows) {
+        for (let cell of row.cells) {
+          if (cell.cellIndex === 0 || row.rowIndex === 0) continue;
+          cell.addEventListener('click', handleEditCellClick);
+        }
+      }
+    }
+    
+    function removeEditClickHandlers() {
+      for (let row of table.rows) {
+        for (let cell of row.cells) {
+          if (cell.cellIndex === 0 || row.rowIndex === 0) continue;
+          cell.removeEventListener('click', handleEditCellClick);
+        }
+      }
+    }
+    
+    function handleEditCellClick(event) {
+      if (!editMode) return;
+      
+      const cell = event.currentTarget;
+      const index = tempSelections.indexOf(cell);
+      
+      if (index > -1) {
+        // Deselect
+        tempSelections.splice(index, 1);
+        cell.classList.remove('selected-for-edit');
+      } else {
+        // Select
+        tempSelections.push(cell);
+        cell.classList.add('selected-for-edit');
+      }
+    }
+    
+    function loadExistingSelections() {
+      // Clear current temp selections
+      document.querySelectorAll('td.selected-for-edit').forEach(cell => {
+        cell.classList.remove('selected-for-edit');
+      });
+      tempSelections = [];
+      
+      const selectedProduct = editProductSelect.value;
+      const existingCapabilities = productCapabilities[selectedProduct] || [];
+      
+      // Find and select existing cells
+      existingCapabilities.forEach(([role, focus]) => {
+        const cell = findCell(role, focus);
+        if (cell) {
+          cell.classList.add('selected-for-edit');
+          tempSelections.push(cell);
+        }
+      });
+    }
+  </script>
+</body>
+</html>
