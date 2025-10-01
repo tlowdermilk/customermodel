@@ -1,0 +1,98 @@
+{
+  "version": "1.0",
+  "timestamp": "2025-10-01T00:00:00.000Z",
+  "productCapabilities": {
+    "github-copilot": [
+      ["Tool", "Code Focused"],
+      ["Advisor", "Code Focused"],
+      ["Co-Creator", "Code Focused"]
+    ],
+    "spec-kit": [
+      ["Advisor", "Intent Focused"],
+      ["Co-Creator", "Intent Focused"],
+      ["Team-Mate", "Intent Focused"]
+    ],
+    "cursor": [
+      ["Tool", "Code Focused"],
+      ["Co-Creator", "Code Focused"],
+      ["Team-Mate", "Code Focused"]
+    ],
+    "claude": [
+      ["Advisor", "Intent Focused"],
+      ["Co-Creator", "Intent Focused"],
+      ["Team-Mate", "Intent Focused"],
+      ["Delegate", "Intent Focused"]
+    ],
+    "copilot-agents": [
+      ["Co-Creator", "Intent Focused"],
+      ["Team-Mate", "Intent Focused"]
+    ]
+  },
+  "productMetadata": {
+    "github-copilot": "GitHub Copilot Completions, NES",
+    "spec-kit": "spec-kit",
+    "cursor": "Cursor IDE",
+    "claude": "Claude",
+    "copilot-agents": "GitHub Copilot Agent Mode"
+  },
+  "presets": {
+    "enterprise-maintainer": [],
+    "ai-native-product-maker": [],
+    "domain-expert-orchestrator": []
+  },
+  "presetFactors": {
+    "enterprise-maintainer": {
+      "expertise": 75,
+      "aicapability": 60,
+      "governance": 85
+    },
+    "ai-native-product-maker": {
+      "expertise": 65,
+      "aicapability": 90,
+      "governance": 40
+    },
+    "domain-expert-orchestrator": {
+      "expertise": 80,
+      "aicapability": 70,
+      "governance": 60
+    }
+  },
+  "presetMetadata": {
+    "enterprise-maintainer": "Enterprise Maintainer",
+    "ai-native-product-maker": "AI-Native Product-Maker",
+    "domain-expert-orchestrator": "Domain Expert Orchestrator"
+  },
+  "workflows": {
+    "enterprise-maintainer:prototyping": [],
+    "ai-native-product-maker:prototyping": [],
+    "domain-expert-orchestrator:prototyping": []
+  },
+  "scenarioFactors": {
+    "enterprise-maintainer:prototyping": {
+      "importance": 50,
+      "complexity": 50,
+      "maturity": 50
+    },
+    "ai-native-product-maker:prototyping": {
+      "importance": 50,
+      "complexity": 50,
+      "maturity": 50
+    },
+    "domain-expert-orchestrator:prototyping": {
+      "importance": 50,
+      "complexity": 50,
+      "maturity": 50
+    }
+  },
+  "scenarioMetadata": {
+    "enterprise-maintainer": {
+      "prototyping": "Prototyping"
+    },
+    "ai-native-product-maker": {
+      "prototyping": "Prototyping"
+    },
+    "domain-expert-orchestrator": {
+      "prototyping": "Prototyping"
+    }
+  }
+}

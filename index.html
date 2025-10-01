@@ -5,6 +5,54 @@
   <meta charset="UTF-8">
   <title>Interactive UX Roles Table</title>
   <style>
+    .data-controls {
+      margin-bottom: 20px;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .data-controls h3 {
+      margin: 0 0 10px 0;
+      color: #2c3e50;
+      font-size: 1em;
+    }
+    .data-controls-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .data-btn {
+      padding: 8px 16px;
+      border: 2px solid #27ae60;
+      background: white;
+      color: #27ae60;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 0.9em;
+    }
+    .data-btn:hover {
+      background: #27ae60;
+      color: white;
+    }
+    .data-btn.backup {
+      border-color: #f39c12;
+      color: #f39c12;
+    }
+    .data-btn.backup:hover {
+      background: #f39c12;
+      color: white;
+    }
+    .data-status {
+      font-size: 0.85em;
+      color: #7f8c8d;
+      font-style: italic;
+    }
+    #fileInput {
+      display: none;
+    }
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
       background-color: #f4f6f8;
@@ -385,6 +433,19 @@
   </style>
 </head>
 <body>
+  <!-- Data Import/Export Controls -->
+  <div class="data-controls">
+    <h3>Data Management</h3>
+    <div class="data-controls-buttons">
+      <button class="data-btn" id="exportDataBtn" title="Export all scenario data to a file">Export Data</button>
+      <button class="data-btn" id="importDataBtn" title="Import scenario data from a file">Import Data</button>
+      <input type="file" id="fileInput" accept=".json" />
+      <button class="data-btn backup" id="createBackupBtn" title="Create a backup of current data">Create Backup</button>
+      <button class="data-btn backup" id="restoreBackupBtn" title="Restore from a previous backup">Restore Backup</button>
+      <span class="data-status" id="dataStatus"></span>
+    </div>
+  </div>
+  
   <div class="preset-controls">
     <h3 class="panel-header" id="presetPanelHeader">
       <span class="panel-title">Profile Presets</span>
@@ -534,6 +595,7 @@
     </table>
   </div>
 
+  <script src="data-storage.js"></script>
   <script>
 const data = {
   // ... (keeping the existing data structure)
@@ -2852,6 +2914,134 @@ const data = {
         }
       });
     }
+    
+    // ===== Data Management Event Listeners =====
+    
+    // Export Data Button
+    document.getElementById('exportDataBtn').addEventListener('click', () => {
+      try {
+        DataStorage.exportToFile();
+        showDataStatus('Data exported successfully!', 'success');
+      } catch (error) {
+        showDataStatus('Failed to export data: ' + error.message, 'error');
+      }
+    });
+    
+    // Import Data Button
+    document.getElementById('importDataBtn').addEventListener('click', () => {
+      document.getElementById('fileInput').click();
+    });
+    
+    // File Input Change Handler
+    document.getElementById('fileInput').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      
+      try {
+        // Create backup before importing
+        DataStorage.createBackup();
+        
+        await DataStorage.importFromFile(file);
+        showDataStatus('Data imported successfully!', 'success');
+        
+        // Clear file input so the same file can be imported again if needed
+        e.target.value = '';
+      } catch (error) {
+        showDataStatus('Failed to import data: ' + error.message, 'error');
+      }
+    });
+    
+    // Create Backup Button
+    document.getElementById('createBackupBtn').addEventListener('click', () => {
+      try {
+        const backupKey = DataStorage.createBackup();
+        if (backupKey) {
+          showDataStatus('Backup created successfully!', 'success');
+        } else {
+          showDataStatus('Failed to create backup', 'error');
+        }
+      } catch (error) {
+        showDataStatus('Failed to create backup: ' + error.message, 'error');
+      }
+    });
+    
+    // Restore Backup Button
+    document.getElementById('restoreBackupBtn').addEventListener('click', () => {
+      const backups = DataStorage.listBackups();
+      
+      if (backups.length === 0) {
+        alert('No backups available');
+        return;
+      }
+      
+      // Create a selection dialog
+      let message = 'Select a backup to restore:\n\n';
+      backups.forEach((backup, index) => {
+        message += `${index + 1}. ${backup.date}\n`;
+      });
+      
+      const selection = prompt(message + '\nEnter the number of the backup to restore (or cancel):');
+      
+      if (!selection) return;
+      
+      const index = parseInt(selection) - 1;
+      if (index < 0 || index >= backups.length) {
+        alert('Invalid selection');
+        return;
+      }
+      
+      const confirmed = confirm(`Are you sure you want to restore the backup from ${backups[index].date}? Current data will be replaced.`);
+      if (!confirmed) return;
+      
+      try {
+        const success = DataStorage.restoreFromBackup(backups[index].key);
+        if (success) {
+          showDataStatus('Backup restored successfully!', 'success');
+        } else {
+          showDataStatus('Failed to restore backup', 'error');
+        }
+      } catch (error) {
+        showDataStatus('Failed to restore backup: ' + error.message, 'error');
+      }
+    });
+    
+    // Helper function to show status messages
+    function showDataStatus(message, type) {
+      const statusElement = document.getElementById('dataStatus');
+      statusElement.textContent = message;
+      statusElement.style.color = type === 'success' ? '#27ae60' : '#e74c3c';
+      
+      // Clear the message after 5 seconds
+      setTimeout(() => {
+        statusElement.textContent = '';
+      }, 5000);
+    }
+    
+    // Auto-save on data changes - hook into existing save functions
+    const originalSaveProductCapabilities = saveProductCapabilities;
+    saveProductCapabilities = function() {
+      originalSaveProductCapabilities();
+      DataStorage.autoSave();
+    };
+    
+    const originalSavePresets = savePresets;
+    savePresets = function() {
+      originalSavePresets();
+      DataStorage.autoSave();
+    };
+    
+    const originalSaveWorkflows = saveWorkflows;
+    saveWorkflows = function() {
+      originalSaveWorkflows();
+      DataStorage.autoSave();
+    };
+    
+    // On page load, check if there's a data file to load
+    window.addEventListener('DOMContentLoaded', () => {
+      // Check localStorage first (existing behavior)
+      // If user wants to load from file, they can use the Import button
+      console.log('UX Table loaded. Use Export/Import buttons to save/load data to files.');
+    });
   </script>
 </body>
 </html>

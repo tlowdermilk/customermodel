@@ -150,7 +150,10 @@ Each cell contains:
 
 ## Data Persistence
 
-The application uses browser localStorage to persist:
+The application uses **two methods** for data persistence:
+
+### 1. Browser localStorage (Automatic)
+Data is automatically saved to browser localStorage when changes are made:
 
 1. **Profile Presets** - User profile definitions and their characteristics
 2. **Preset Factors** - The three factors (Expertise, AI Capability, Governance) for each preset
@@ -171,12 +174,38 @@ The application uses browser localStorage to persist:
 - `uxTableProductCapabilities` - Product cell mappings
 - `uxTableProductMetadata` - Product display names
 
+### 2. File-Based Storage (Manual)
+You can export and import all scenario data to/from a JSON file:
+
+**Export Data**:
+- Click the "Export Data" button in the Data Management section
+- A `ux-table-data.json` file will be downloaded
+- This file contains all your customizations: presets, scenarios, workflows, and product mappings
+- Share this file with team members or store it for backup
+
+**Import Data**:
+- Click the "Import Data" button
+- Select a previously exported `ux-table-data.json` file
+- All data will be loaded and displayed immediately
+- A backup of current data is automatically created before import
+
+**Create Backup**:
+- Click "Create Backup" to save a snapshot of current data
+- Backups are stored in localStorage with timestamps
+- Up to 5 most recent backups are kept
+
+**Restore Backup**:
+- Click "Restore Backup" to view and restore from previous backups
+- Select from a list of dated backups
+- Current data will be replaced with the selected backup
+
 **Important Notes**:
-- Data persists per browser/device
+- localStorage data persists per browser/device
 - Clearing browser data will reset to defaults
-- Changes are saved automatically when you click "Exit" in edit mode
-- No server-side storage - all data is local
+- File-based storage allows cross-browser and cross-device sharing
+- Changes are saved automatically to localStorage when you click "Exit" in edit mode
 - Scenarios are associated with presets using composite keys (e.g., "enterprise-maintainer:prototyping")
+- The application loads from localStorage on startup; use Import to load from a file
 
 ## Customization
 
@@ -285,8 +314,10 @@ const defaultScenarioFactors = {
 ## File Structure
 
 ```
-index.html          - Main application file (self-contained)
-README.md           - This documentation file
+index.html              - Main application file with UI and core functionality
+data-storage.js         - Data management module for export/import functionality
+ux-table-data.json      - Sample/template data file (can be customized)
+README.md               - This documentation file
 ```
 
 ## Getting Started
@@ -303,6 +334,10 @@ README.md           - This documentation file
    - Click "Edit" buttons to enter edit mode
    - Use "Add", "Rename", "Delete" buttons to manage items
    - Click "Exit" to save and exit edit mode
+7. **Save your work**: Use the Data Management section to export your customizations
+   - Click "Export Data" to save all changes to a file
+   - Click "Import Data" to load previously saved data
+   - Create backups before making major changes
 
 ## Understanding the Hierarchy
 
@@ -331,10 +366,37 @@ This hierarchy means:
 - Deleting a preset deletes all its scenarios and workflows
 - You must select a preset before scenarios appear
 
+## Data Management Features
+
+### Export/Import
+- **Export**: Download all scenario data as a JSON file for backup or sharing
+- **Import**: Load scenario data from a previously exported file
+- **Auto-backup**: Automatic backup is created before importing data
+- **Cross-device**: Share data files across browsers and devices
+
+### Backup System
+- **Create Backup**: Save a snapshot of current data with timestamp
+- **Restore Backup**: Browse and restore from up to 5 recent backups
+- **Automatic Cleanup**: Old backups are automatically removed (keeps last 5)
+
+### Data Format
+The JSON data file includes:
+- Version and timestamp information
+- Product capabilities and metadata
+- Profile presets and their factors
+- Scenario workflows and factors
+- All display names and customizations
+
+### Use Cases
+- **Team Collaboration**: Share customized presets and scenarios with team members
+- **Version Control**: Export data files and track them in version control
+- **Environment Management**: Maintain different configurations for different contexts
+- **Backup**: Create regular backups before making significant changes
+- **Migration**: Move data between browsers or devices easily
+
 ## Future Enhancements
 
 Potential areas for expansion:
-- Export/import functionality for presets, scenarios, and products
 - More preset and scenario templates
 - Additional visualization options
 - Comparison mode to overlay multiple workflows
@@ -342,6 +404,8 @@ Potential areas for expansion:
 - Shareable URLs with encoded configurations
 - Preset cloning to quickly create variations
 - Bulk scenario operations
+- Cloud-based synchronization
+- Real-time collaboration features
 
 ## Credits
 
