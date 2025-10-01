@@ -7,9 +7,10 @@ An interactive visualization tool for exploring different UX interaction pattern
 This application provides a comprehensive framework for understanding how users interact with AI tools across different contexts. It visualizes:
 
 1. **UX Interaction Modes** - A 5x3 matrix showing different roles (Tool, Advisor, Co-Creator, Team-Mate, Delegate) across three focus areas (Code, Intent, Orchestration)
-2. **Product Capabilities** - Highlights which interaction modes different AI products support
-3. **User Scenarios & Workflows** - Visualizes how users move between different interaction modes during specific tasks
-4. **Situational Factors** - Shows the contextual factors that influence workflow patterns
+2. **Profile Presets** - Predefined user profiles (e.g., Enterprise Maintainer, AI-Native Product-Maker) with associated user characteristics
+3. **Scenarios** - Specific tasks or contexts within each profile (e.g., Prototyping) with workflow visualizations
+4. **Product Capabilities** - Highlights which interaction modes different AI products support
+5. **Situational Factors** - Contextual factors that influence both user profiles and specific scenarios
 
 ## Table Structure
 
@@ -39,142 +40,201 @@ Each cell contains:
 - **Smart Positioning** - Flyouts appear above cells in the last row to stay visible
 - **Left-Aligned Text** - All content is left-aligned for readability
 
-### 2. Product Capability Visualization
+### 2. Profile Presets
 
-**Purpose**: Highlight which cells represent interaction patterns supported by specific AI products.
+**Purpose**: Define different user profiles with characteristic expertise levels, AI capabilities, and governance requirements.
+
+**Default Presets**:
+- **Enterprise Maintainer** - Seasoned professional working in enterprise environment with high governance needs
+- **AI-Native Product-Maker** - Product-focused developer leveraging AI-first approaches with lower governance
+- **Domain Expert Orchestrator** - Domain authority using orchestration tools with balanced oversight
 
 **How to Use**:
-1. Click any product button (GitHub Copilot, spec-kit, Cursor IDE, Claude, or GitHub Copilot Agent Mode)
-2. Relevant cells are highlighted in blue
-3. Click "Clear All" to remove highlights
+1. Click a preset button to select that profile
+2. The situational factors on the right show the profile's characteristics:
+   - **Human Expertise** (0-100) - Developer's skill/confidence level
+   - **AI Capability** (0-100) - How capable/reliable the AI tools are
+   - **Governance & Safety** (0-100) - Compliance and safety requirements
+3. Click the same button again to deselect
+4. When a preset is selected, you can then select scenarios specific to that profile
 
 **Edit Mode**:
-1. Click "Enter Edit Mode"
-2. Select a product from the dropdown
-3. Click cells to toggle their selection (yellow highlighting)
-4. Click "Save" to persist changes or "Cancel" to discard
-5. The existing mappings for the selected product are pre-loaded for easy modification
+1. Click "Edit" to enter edit mode
+2. Use the dropdown to select which preset to modify
+3. Click on the factor bars to adjust values for the selected preset
+   - Click anywhere on a bar to set that value
+   - Or use the input field that appears in edit mode
+4. Use "Add" to create a new preset
+5. Use "Rename" to change a preset's display name
+6. Use "Delete" to remove a preset (and all its scenarios)
+7. Click "Exit" to save changes and exit edit mode
 
-**Persistence**: Product mappings are saved to browser localStorage and persist across page refreshes.
+**Collapsible Panel**: Click the panel header or the +/− button to collapse/expand. When collapsed, shows the currently selected preset.
 
-**Reset**: Click "Reset to Defaults" to restore original product mappings.
+**Persistence**: Preset definitions and factor values are saved to browser localStorage.
 
-### 3. User Scenarios & Workflows
+### 3. Scenarios
 
-**Purpose**: Visualize how users move between different interaction modes during specific tasks.
+**Purpose**: Define specific workflows within each profile, showing how users navigate between interaction modes during particular tasks.
+
+**Important**: Scenarios are **profile-specific**. Each profile preset has its own set of scenarios. You must select a Profile Preset first before scenarios will appear.
+
+**Default Scenario**: Every profile has a "Prototyping" scenario by default (factors set to 50).
 
 **How to Use**:
-1. Click a scenario button to see the workflow:
-   - **Developer: Prototype** - Fast experimentation workflow
-   - **Developer: Production** - Professional, careful workflow
-   - **Developer: Learning** - Educational, exploration-focused workflow
-   - **Custom Scenario 1** - Your own custom workflow
-2. The visualization shows:
-   - **Numbered dots** on cells (1, 2, 3...) indicating sequence
-   - **Curved connecting lines** showing the path between steps
+1. First, select a Profile Preset (e.g., "Enterprise Maintainer")
+2. Scenarios for that preset will appear in the Scenarios panel
+3. Click a scenario button to visualize the workflow:
+   - **Numbered purple dots** appear on cells (1, 2, 3...) showing sequence
+   - **Curved connecting lines** show the path between steps
    - **Purple highlighting** on selected cells
-3. Click "Clear Scenario" to remove the visualization
+4. The situational factors on the right show context-specific values:
+   - **Task Importance** (0-100) - How critical is this task?
+   - **Task Complexity** (0-100) - How complex is this work?
+   - **Codebase Maturity** (0-100) - How established is the codebase?
+5. Click the same scenario button again to deselect and clear the visualization
 
 **Workflow Visualization**:
 - Lines curve to avoid passing through intermediate cells
 - The order of cells matters - it represents the temporal sequence
 - Numbers on dots show the exact order of the workflow
+- The workflow is specific to the **combination** of preset + scenario
 
-**Edit Scenario Mode**:
-1. Click "Edit Scenario"
-2. Select a scenario from the dropdown
-3. Click cells **in order** to build the workflow path
+**Edit Mode**:
+1. Ensure a Profile Preset is selected first
+2. Click "Edit" to enter scenario edit mode
+3. Use the dropdown to select which scenario to modify
+4. Click cells **in order** on the table to build the workflow path
    - Each click adds the cell to the sequence
-   - Click an existing dot to remove it and all subsequent steps
-4. Watch the real-time preview with numbered dots and connecting lines
-5. Click "Save" to persist or "Cancel" to discard
-6. Existing workflow is pre-loaded for easy modification
+   - Click an existing numbered dot to remove it and all subsequent steps
+5. Click on the factor bars to adjust contextual values for this specific scenario
+6. Use "Add" to create a new scenario for the current preset
+7. Use "Rename" to change a scenario's display name
+8. Use "Delete" to remove a scenario (every preset must keep at least one scenario)
+9. Click "Exit" to save changes and exit edit mode
 
-**Persistence**: Scenarios are saved to browser localStorage.
+**Collapsible Panel**: Click the panel header or the +/− button to collapse/expand. When collapsed, shows the currently selected scenario.
 
-**Reset**: Click "Reset Scenarios" to restore default workflows.
+**Persistence**: Scenario workflows and factor values are saved to browser localStorage with composite keys (preset:scenario).
 
-### 4. Situational Factors Equalizer
+### 4. Product Capability Visualization
 
-**Purpose**: Display the contextual factors that influence why users choose different interaction patterns.
+**Purpose**: Highlight which cells represent interaction patterns supported by specific AI products.
 
-**Factors Visualized** (0-100 scale):
-- **Task Importance** - How critical is the task?
-- **Task Complexity** - How complex is the work?
-- **Human Expertise** - Developer's skill/confidence level
-- **AI Capability** - How capable/reliable is the AI?
-- **Codebase Maturity** - How established is the codebase?
-- **Governance & Safety** - Compliance and safety requirements
+**Default Products**:
+- GitHub Copilot Completions, NES
+- spec-kit
+- Cursor IDE
+- Claude
+- GitHub Copilot Agent Mode
 
-**How It Works**:
-- Bars start empty when no scenario is selected
-- When you select a scenario, bars animate to show relevant factor levels
-- Higher bars = more of that factor
-- Values display below each bar
-- Factors are read-only and automatically set by scenario selection
+**How to Use**:
+1. Click any product button to select it
+2. Relevant cells are highlighted in blue
+3. Click the same button again to deselect and clear highlights
+4. Only one product can be selected at a time
 
-**Example - Developer: Prototype**:
-- Low importance (30) - experimental work
-- Lower complexity (40) - proving concept
-- Moderate expertise (60) - exploring
-- High AI capability (70) - leveraging tools
-- Low maturity (20) - new codebase
-- Low governance (20) - move fast
+**Edit Mode**:
+1. Click "Edit" to enter edit mode
+2. Use the dropdown to select which product to modify
+3. Click cells to toggle their selection (yellow highlighting)
+4. Use "Add" to create a new product
+5. Use "Rename" to change a product's display name
+6. Use "Delete" to remove a product completely
+7. Click "Exit" to save changes and exit edit mode
+8. Existing mappings for the selected product are pre-loaded for easy modification
 
-**Example - Developer: Production**:
-- High importance (85) - production code
-- Higher complexity (70) - real features
-- Higher expertise (75) - professional work
-- Good AI capability (65) - reliable assistant
-- High maturity (80) - established codebase
-- High governance (80) - safety critical
+**Collapsible Panel**: Click the panel header or the +/− button to collapse/expand. When collapsed, shows the currently selected product.
+
+**Persistence**: Product mappings are saved to browser localStorage and persist across page refreshes.
 
 ## Data Persistence
 
 The application uses browser localStorage to persist:
 
-1. **Product Capability Mappings** - Which cells each product lights up
-2. **Scenario Workflows** - The sequence of cells for each scenario
+1. **Profile Presets** - User profile definitions and their characteristics
+2. **Preset Factors** - The three factors (Expertise, AI Capability, Governance) for each preset
+3. **Preset Metadata** - Display names for each preset
+4. **Scenario Workflows** - The sequence of cells for each preset:scenario combination
+5. **Scenario Factors** - The three factors (Importance, Complexity, Maturity) for each preset:scenario combination
+6. **Scenario Metadata** - Display names for scenarios within each preset
+7. **Product Capability Mappings** - Which cells each product lights up
+8. **Product Metadata** - Display names for each product
 
-**Storage Key**: 
-- `uxTableProductCapabilities` - Product mappings
-- `uxTableScenarios` - Scenario workflows
+**Storage Keys**: 
+- `uxTablePresets` - Preset definitions (currently unused - presets don't have cell workflows)
+- `uxTablePresetFactors` - Factor values for each preset
+- `uxTablePresetMetadata` - Preset display names
+- `uxTableWorkflows` - Scenario workflows (keyed by "preset:scenario")
+- `uxTableScenarioFactors` - Factor values for each scenario (keyed by "preset:scenario")
+- `uxTableScenarioMetadata` - Scenario names organized by preset
+- `uxTableProductCapabilities` - Product cell mappings
+- `uxTableProductMetadata` - Product display names
 
 **Important Notes**:
 - Data persists per browser/device
 - Clearing browser data will reset to defaults
-- Changes are saved automatically when you click "Save" in edit mode
+- Changes are saved automatically when you click "Exit" in edit mode
 - No server-side storage - all data is local
+- Scenarios are associated with presets using composite keys (e.g., "enterprise-maintainer:prototyping")
 
 ## Customization
 
+### Adding New Profile Presets
+
+1. Click "Edit" in the Profile Presets section
+2. Click "Add" button
+3. Enter a name for the new preset
+4. Adjust the three factor bars (Expertise, AI Capability, Governance) by clicking on them
+5. A default "Prototyping" scenario is automatically created for the new preset
+6. Click "Exit" to save
+
+### Adding New Scenarios to a Preset
+
+1. Select a Profile Preset first
+2. Click "Edit" in the Scenarios section
+3. Click "Add" button
+4. Enter a name for the new scenario
+5. Click cells in order on the table to define the workflow
+6. Adjust the three factor bars (Importance, Complexity, Maturity) by clicking on them
+7. Click "Exit" to save
+
 ### Adding New Products
 
-1. Click "Enter Edit Mode" in the Product Capabilities section
-2. Select an existing product or modify the dropdown in the code to add new ones
-3. Click cells to define the product's capability matrix
-4. Click "Save" to persist
+1. Click "Edit" in the Product Capabilities section
+2. Click "Add" button
+3. Enter a name for the new product
+4. Click cells to define which interaction modes the product supports
+5. Click "Exit" to save
 
-### Creating Custom Scenarios
+### Modifying Factor Values
 
-1. Click "Edit Scenario" in the User Scenarios section
-2. Select "Custom Scenario 1" (or add more in the code)
-3. Click cells in the order users would traverse them
-4. Click "Save" to persist
+**In the UI** (Recommended):
+1. Enter edit mode for either Profile Presets or Scenarios
+2. Select the preset/scenario to modify from the dropdown
+3. Click directly on the colored bars to set values (0-100)
+4. Or use the input fields that appear in edit mode
+5. Click "Exit" to save
 
-### Modifying Situational Factors
-
-Edit the `scenarioFactors` object in the JavaScript code:
+**In Code** (Advanced):
+Edit the default data structures in the JavaScript:
 
 ```javascript
-const scenarioFactors = {
-  'scenario-key': {
-    importance: 50,    // 0-100
-    complexity: 50,    // 0-100
-    expertise: 50,     // 0-100
-    aicapability: 50,  // 0-100
-    maturity: 50,      // 0-100
-    governance: 50     // 0-100
+// Profile Preset Factors
+const defaultPresetFactors = {
+  'preset-key': {
+    expertise: 75,      // 0-100
+    aicapability: 60,   // 0-100
+    governance: 85      // 0-100
+  }
+};
+
+// Scenario Factors (keyed by "preset:scenario")
+const defaultScenarioFactors = {
+  'preset-key:scenario-key': {
+    importance: 50,   // 0-100
+    complexity: 50,   // 0-100
+    maturity: 50      // 0-100
   }
 };
 ```
@@ -212,35 +272,76 @@ const scenarioFactors = {
 ## Usage Tips
 
 1. **Exploring the Table** - Start by hovering over cells to understand the different interaction patterns
-2. **Understanding Products** - Click product buttons to see which patterns they support
-3. **Seeing Workflows** - Click scenario buttons to visualize how users move between patterns
-4. **Understanding Context** - Watch the situational factors to understand why workflows differ
-5. **Customizing** - Use edit modes to create your own product mappings and scenarios
+2. **Understanding User Profiles** - Click a Profile Preset button to see typical user characteristics (expertise, AI capability, governance needs)
+3. **Seeing Workflows** - Select a preset, then click a scenario button to visualize how that type of user approaches that specific task
+4. **Understanding Context** - Watch both sets of situational factors:
+   - **Preset factors** show the user's inherent characteristics
+   - **Scenario factors** show the task-specific context
+5. **Understanding Products** - Click product buttons to see which interaction patterns different tools support
+6. **Collapsing Panels** - Click panel headers to collapse sections and save screen space
+7. **Customizing** - Use edit modes to create your own presets, scenarios, and product mappings
+8. **Workflow Hierarchy** - Remember: Profile Presets → Scenarios → Workflows (scenarios belong to presets)
 
 ## File Structure
 
 ```
-model.html          - Main application file (self-contained)
+index.html          - Main application file (self-contained)
 README.md           - This documentation file
 ```
 
 ## Getting Started
 
-1. Open `model.html` in a modern web browser
-2. Hover over cells in the table to explore interaction patterns
-3. Click a product button to see which patterns it supports
-4. Click a scenario button to see a workflow visualization
-5. Use edit modes to customize products and scenarios
+1. Open `index.html` in a modern web browser
+2. **Explore the table**: Hover over cells to see interaction pattern details
+3. **Understand user profiles**: Click a Profile Preset button (e.g., "Enterprise Maintainer")
+   - Notice the three factors on the right showing user characteristics
+4. **See a workflow**: With a preset selected, click a Scenario button (e.g., "Prototyping")
+   - Numbered purple dots and curved lines show the workflow path
+   - Three scenario-specific factors appear on the right
+5. **Compare products**: Click a Product Capability button to see which patterns that tool supports
+6. **Customize**: Use edit modes to create your own presets, scenarios, and product mappings
+   - Click "Edit" buttons to enter edit mode
+   - Use "Add", "Rename", "Delete" buttons to manage items
+   - Click "Exit" to save and exit edit mode
+
+## Understanding the Hierarchy
+
+The application follows a three-level hierarchy:
+
+1. **Profile Presets** (User Profiles)
+   - Define types of users with characteristic traits
+   - Have 3 factors: Human Expertise, AI Capability, Governance & Safety
+   - Examples: Enterprise Maintainer, AI-Native Product-Maker
+   
+2. **Scenarios** (Tasks within Profiles)
+   - Specific tasks or contexts a user type might encounter
+   - Each preset has its own set of scenarios
+   - Have 3 different factors: Task Importance, Task Complexity, Codebase Maturity
+   - Example: Enterprise Maintainer → Prototyping scenario
+   
+3. **Workflows** (Cell Sequences)
+   - The actual path through the interaction matrix
+   - Defined by the combination of preset + scenario
+   - Visualized with numbered dots and curved connecting lines
+   - Example: "enterprise-maintainer:prototyping" workflow
+
+This hierarchy means:
+- A scenario belongs to a specific preset (not global)
+- A workflow is defined by the preset:scenario combination
+- Deleting a preset deletes all its scenarios and workflows
+- You must select a preset before scenarios appear
 
 ## Future Enhancements
 
 Potential areas for expansion:
-- Export/import functionality for scenarios and products
-- More scenario templates
+- Export/import functionality for presets, scenarios, and products
+- More preset and scenario templates
 - Additional visualization options
-- Comparison mode to overlay multiple scenarios
+- Comparison mode to overlay multiple workflows
 - Analytics on workflow patterns
 - Shareable URLs with encoded configurations
+- Preset cloning to quickly create variations
+- Bulk scenario operations
 
 ## Credits
 
