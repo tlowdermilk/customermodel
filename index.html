@@ -5,33 +5,87 @@
   <meta charset="UTF-8">
   <title>Interactive UX Roles Table</title>
   <style>
-    .data-controls {
-      margin-bottom: 20px;
+    .hamburger-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 2000;
+    }
+    .hamburger-btn {
+      width: 45px;
+      height: 45px;
       background: white;
-      padding: 15px;
-      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+    .hamburger-btn:hover {
+      background: #f8f9fa;
+      border-color: #bdc3c7;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+    }
+    .hamburger-btn span {
+      width: 22px;
+      height: 2px;
+      background: #7f8c8d;
+      border-radius: 2px;
+      transition: all 0.3s ease;
+    }
+    .hamburger-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(7px, 7px);
+    }
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(7px, -7px);
+    }
+    .data-controls {
+      position: fixed;
+      top: 0;
+      right: -400px;
+      width: 380px;
+      height: 100vh;
+      background: white;
+      box-shadow: -4px 0 12px rgba(0,0,0,0.15);
+      z-index: 1999;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      padding: 80px 20px 20px 20px;
+    }
+    .data-controls.open {
+      right: 0;
     }
     .data-controls h3 {
-      margin: 0 0 10px 0;
+      margin: 0 0 15px 0;
       color: #2c3e50;
-      font-size: 1em;
+      font-size: 1.2em;
+      border-bottom: 2px solid #27ae60;
+      padding-bottom: 10px;
     }
     .data-controls-buttons {
       display: flex;
+      flex-direction: column;
       gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
     }
     .data-btn {
-      padding: 8px 16px;
+      padding: 12px 16px;
       border: 2px solid #27ae60;
       background: white;
       color: #27ae60;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.3s ease;
-      font-size: 0.9em;
+      font-size: 0.95em;
+      text-align: left;
+      width: 100%;
     }
     .data-btn:hover {
       background: #27ae60;
@@ -49,9 +103,28 @@
       font-size: 0.85em;
       color: #7f8c8d;
       font-style: italic;
+      margin-top: 15px;
+      padding: 10px;
+      background: #f8f9fa;
+      border-radius: 4px;
+      min-height: 20px;
     }
     #fileInput {
       display: none;
+    }
+    .menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 1998;
+      display: none;
+      transition: opacity 0.3s ease;
+    }
+    .menu-overlay.open {
+      display: block;
     }
     body {
       font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
@@ -327,11 +400,12 @@
     }
     .panel-header {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-start;
       align-items: center;
       cursor: pointer;
       margin: 0 0 10px 0;
       color: #2c3e50;
+      gap: 10px;
     }
     .panel-title {
       flex-grow: 1;
@@ -349,6 +423,8 @@
       font-size: 16px;
       color: #7f8c8d;
       transition: all 0.2s ease;
+      flex-shrink: 0;
+      order: -1;
     }
     .collapse-btn:hover {
       background: #ecf0f1;
@@ -433,16 +509,28 @@
   </style>
 </head>
 <body>
-  <!-- Data Import/Export Controls -->
-  <div class="data-controls">
+  <!-- Hamburger Menu Button -->
+  <div class="hamburger-menu">
+    <button class="hamburger-btn" id="hamburgerBtn" title="Data Management">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+  </div>
+  
+  <!-- Menu Overlay -->
+  <div class="menu-overlay" id="menuOverlay"></div>
+  
+  <!-- Data Import/Export Controls (Hidden Sidebar) -->
+  <div class="data-controls" id="dataControls">
     <h3>Data Management</h3>
     <div class="data-controls-buttons">
-      <button class="data-btn" id="exportDataBtn" title="Export all scenario data to a file">Export Data</button>
-      <button class="data-btn" id="importDataBtn" title="Import scenario data from a file">Import Data</button>
+      <button class="data-btn" id="exportDataBtn" title="Export all scenario data to a file">📥 Export Data</button>
+      <button class="data-btn" id="importDataBtn" title="Import scenario data from a file">📤 Import Data</button>
       <input type="file" id="fileInput" accept=".json" />
-      <button class="data-btn backup" id="createBackupBtn" title="Create a backup of current data">Create Backup</button>
-      <button class="data-btn backup" id="restoreBackupBtn" title="Restore from a previous backup">Restore Backup</button>
-      <span class="data-status" id="dataStatus"></span>
+      <button class="data-btn backup" id="createBackupBtn" title="Create a backup of current data">💾 Create Backup</button>
+      <button class="data-btn backup" id="restoreBackupBtn" title="Restore from a previous backup">♻️ Restore Backup</button>
+      <div class="data-status" id="dataStatus"></div>
     </div>
   </div>
   
@@ -2922,6 +3010,7 @@ const data = {
       try {
         DataStorage.exportToFile();
         showDataStatus('Data exported successfully!', 'success');
+        closeMenuAfterOperation();
       } catch (error) {
         showDataStatus('Failed to export data: ' + error.message, 'error');
       }
@@ -2943,6 +3032,7 @@ const data = {
         
         await DataStorage.importFromFile(file);
         showDataStatus('Data imported successfully!', 'success');
+        closeMenuAfterOperation();
         
         // Clear file input so the same file can be imported again if needed
         e.target.value = '';
@@ -2957,6 +3047,7 @@ const data = {
         const backupKey = DataStorage.createBackup();
         if (backupKey) {
           showDataStatus('Backup created successfully!', 'success');
+          closeMenuAfterOperation();
         } else {
           showDataStatus('Failed to create backup', 'error');
         }
@@ -2997,6 +3088,7 @@ const data = {
         const success = DataStorage.restoreFromBackup(backups[index].key);
         if (success) {
           showDataStatus('Backup restored successfully!', 'success');
+          closeMenuAfterOperation();
         } else {
           showDataStatus('Failed to restore backup', 'error');
         }
@@ -3035,6 +3127,36 @@ const data = {
       originalSaveWorkflows();
       DataStorage.autoSave();
     };
+    
+    // Hamburger menu functionality
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const dataControls = document.getElementById('dataControls');
+    const menuOverlay = document.getElementById('menuOverlay');
+    
+    function toggleMenu() {
+      hamburgerBtn.classList.toggle('active');
+      dataControls.classList.toggle('open');
+      menuOverlay.classList.toggle('open');
+    }
+    
+    hamburgerBtn.addEventListener('click', toggleMenu);
+    menuOverlay.addEventListener('click', toggleMenu);
+    
+    // Close menu on escape key
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && dataControls.classList.contains('open')) {
+        toggleMenu();
+      }
+    });
+    
+    // Close menu after successful operations
+    function closeMenuAfterOperation() {
+      setTimeout(() => {
+        if (dataControls.classList.contains('open')) {
+          toggleMenu();
+        }
+      }, 2000); // Close 2 seconds after showing status message
+    }
     
     // On page load, check if there's a data file to load
     window.addEventListener('DOMContentLoaded', () => {
