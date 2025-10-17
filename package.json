@@ -1,0 +1,27 @@
+{
+  "name": "customermodel",
+  "version": "1.0.0",
+  "description": "An interactive visualization tool for exploring different UX interaction patterns between humans and AI systems across varying levels of autonomy and focus areas.",
+  "main": "data-storage.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tlowdermilk/customermodel.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/tlowdermilk/customermodel/issues"
+  },
+  "homepage": "https://github.com/tlowdermilk/customermodel#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "mysql2": "^3.15.2"
+  }
+}
