@@ -4,6 +4,7 @@
   "description": "An interactive visualization tool for exploring different UX interaction patterns between humans and AI systems across varying levels of autonomy and focus areas.",
   "main": "data-storage.js",
   "scripts": {
+    "build": "echo \"Building customermodel for Azure Static Web App\" && npm --prefix ./api install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
