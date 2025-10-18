@@ -5,16 +5,16 @@
 
 const API = (function() {
   // Base URL for API - configurable for different environments
-  // For local development, always use localhost:7071 for Azure Functions
-  // For production, use relative path '/api'
+  // For local development, use the same server (port 3000)
+  // For production (Azure), use relative path '/api'
   const isLocalDev = window.location.hostname === 'localhost' || 
                      window.location.hostname === '127.0.0.1' ||
                      window.location.hostname.startsWith('10.') ||
                      window.location.hostname.startsWith('192.168.');
   
   const BASE_URL = isLocalDev
-    ? 'http://localhost:7071/api' 
-    : '/api';
+    ? 'http://localhost:3000/api'   // Local development (Express server)
+    : '/api';                         // Production (Azure App Service)
   
   console.log(`API Client initialized with BASE_URL: ${BASE_URL}`);
   
