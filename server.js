@@ -94,14 +94,25 @@ async function handleAzureFunction(handler, req, res) {
 }
 
 // API Routes - Mount handlers with proper route matching
+// Products
 app.all('/api/products', (req, res) => handleAzureFunction(productsHandler.handler, req, res));
 app.all('/api/products/:productKey', (req, res) => handleAzureFunction(productsHandler.handler, req, res));
+
+// Profiles
 app.all('/api/profiles', (req, res) => handleAzureFunction(profilesHandler.handler, req, res));
 app.all('/api/profiles/:profileKey', (req, res) => handleAzureFunction(profilesHandler.handler, req, res));
+
+// Scenarios (requires both profileKey and scenarioKey)
 app.all('/api/scenarios', (req, res) => handleAzureFunction(scenariosHandler.handler, req, res));
-app.all('/api/scenarios/:scenarioKey', (req, res) => handleAzureFunction(scenariosHandler.handler, req, res));
+app.all('/api/scenarios/:profileKey', (req, res) => handleAzureFunction(scenariosHandler.handler, req, res));
+app.all('/api/scenarios/:profileKey/:scenarioKey', (req, res) => handleAzureFunction(scenariosHandler.handler, req, res));
+
+// Workflow Steps (requires both profileKey and scenarioKey)
 app.all('/api/workflow-steps', (req, res) => handleAzureFunction(workflowStepsHandler.handler, req, res));
-app.all('/api/workflow-steps/:workflowStepKey', (req, res) => handleAzureFunction(workflowStepsHandler.handler, req, res));
+app.all('/api/workflow-steps/:profileKey', (req, res) => handleAzureFunction(workflowStepsHandler.handler, req, res));
+app.all('/api/workflow-steps/:profileKey/:scenarioKey', (req, res) => handleAzureFunction(workflowStepsHandler.handler, req, res));
+
+// Vocabularies
 app.all('/api/vocabularies', (req, res) => handleAzureFunction(vocabulariesHandler.handler, req, res));
 app.all('/api/vocabularies/:vocabularyKey', (req, res) => handleAzureFunction(vocabulariesHandler.handler, req, res));
 
@@ -126,15 +137,46 @@ app.use((err, req, res, next) => {
 
 // Start server
 const server = app.listen(PORT, () => {
-  console.log(`Server started on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  const isLocalhost = ['localhost', '127.0.0.1', '::1'].includes(process.env.HOSTNAME) || 
+                      process.env.NODE_ENV === 'development';
+  
+  console.log('');
+  console.log('╔════════════════════════════════════════════════════════════╗');
+  console.log('║           Server Started Successfully ✓                    ║');
+  console.log('╚════════════════════════════════════════════════════════════╝');
+  console.log('');
+  
+  if (isLocalhost) {
+    console.log('📍 Local Development Mode');
+    console.log(`🌐 Application URL: http://localhost:${PORT}`);
+    console.log(`📊 API Base URL: http://localhost:${PORT}/api`);
+    console.log('');
+    console.log('Available Endpoints:');
+    console.log(`  🔗 http://localhost:${PORT}/api/products`);
+    console.log(`  🔗 http://localhost:${PORT}/api/profiles`);
+    console.log(`  🔗 http://localhost:${PORT}/api/scenarios`);
+    console.log(`  🔗 http://localhost:${PORT}/api/workflow-steps`);
+    console.log(`  🔗 http://localhost:${PORT}/api/vocabularies`);
+    console.log('');
+    console.log('📋 Configuration:');
+    console.log(`   • Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   • Database Host: ${process.env.DB_HOST}`);
+    console.log(`   • Database: ${process.env.DB_NAME}`);
+    console.log(`   • SSL Enabled: ${process.env.DB_SSL === 'true' ? 'Yes' : 'No'}`);
+    console.log(`   • Loaded from: .env file (local development)`);
+  } else {
+    console.log('☁️  Production Mode (Azure App Service)');
+    console.log(`🌐 Port: ${PORT}`);
+    console.log('');
+    console.log('📋 Configuration:');
+    console.log(`   • Environment: ${process.env.NODE_ENV || 'production'}`);
+    console.log(`   • Database: Loaded from Azure Key Vault`);
+    console.log(`   • SSL: Enabled (Azure MySQL requirement)`);
+  }
+  
+  console.log('');
   console.log(`Static files served from: ${__dirname}`);
-  console.log(`API routes registered:`);
-  console.log(`  - /api/products`);
-  console.log(`  - /api/profiles`);
-  console.log(`  - /api/scenarios`);
-  console.log(`  - /api/workflow-steps`);
-  console.log(`  - /api/vocabularies`);
+  console.log('');
 });
 
 // Handle server errors
