@@ -16,8 +16,17 @@ async function initializePool() {
   }
 
   try {
+    console.log('📊 Initializing database pool...');
+    
     // Load database configuration from Key Vault (if available) or environment variables
     const config = await keyVault.loadDatabaseConfig();
+    
+    console.log('✅ Database configuration loaded:');
+    console.log(`   • Host: ${config.host}`);
+    console.log(`   • Port: ${config.port}`);
+    console.log(`   • User: ${config.user}`);
+    console.log(`   • Database: ${config.database}`);
+    console.log(`   • SSL: ${process.env.DB_SSL === 'true' ? 'Enabled' : 'Disabled'}`);
 
     const ssl = process.env.DB_SSL === 'true'
       ? {
@@ -29,6 +38,7 @@ async function initializePool() {
         }
       : undefined;
 
+    console.log('🔌 Creating connection pool...');
     pool = mysql.createPool({
       host: config.host,
       port: config.port,
@@ -42,10 +52,14 @@ async function initializePool() {
     });
 
     poolInitialized = true;
-    console.log('Database pool initialized successfully');
+    console.log('✅ Database pool initialized successfully');
+    console.log('');
     return pool;
   } catch (error) {
-    console.error('Failed to initialize database pool:', error);
+    console.error('❌ Failed to initialize database pool:');
+    console.error(`   Error: ${error.message}`);
+    console.error(`   Code: ${error.code}`);
+    console.error(`   Errno: ${error.errno}`);
     throw error;
   }
 }
@@ -65,9 +79,17 @@ async function getPool() {
  * Execute a query
  */
 async function query(sql, params = []) {
-  const pool = await getPool();
-  const [results] = await pool.execute(sql, params);
-  return results;
+  try {
+    const pool = await getPool();
+    const [results] = await pool.execute(sql, params);
+    return results;
+  } catch (error) {
+    console.error('❌ Database query failed:');
+    console.error(`   SQL: ${sql}`);
+    console.error(`   Error: ${error.message}`);
+    console.error(`   Code: ${error.code}`);
+    throw error;
+  }
 }
 
 /**
