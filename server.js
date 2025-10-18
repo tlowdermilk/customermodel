@@ -11,10 +11,25 @@ const cors = require('cors');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Determine if running in production (Azure)
+const isProduction = process.env.NODE_ENV === 'production' || !['localhost', '127.0.0.1'].includes(process.env.HOSTNAME);
+
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Disable caching for JavaScript files in development
+if (!isProduction) {
+  app.use((req, res, next) => {
+    if (req.path.endsWith('.js') || req.path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+    next();
+  });
+}
 
 // Import API handlers directly
 let productsHandler, profilesHandler, scenariosHandler, workflowStepsHandler, vocabulariesHandler;
@@ -118,7 +133,7 @@ app.all('/api/vocabularies/:vocabularyKey', (req, res) => handleAzureFunction(vo
 
 // Serve static files from root directory
 app.use(express.static(path.join(__dirname), {
-  maxAge: '1h',
+  maxAge: isProduction ? '1h' : '0',  // No cache for local dev, 1h for production
   etag: false
 }));
 
