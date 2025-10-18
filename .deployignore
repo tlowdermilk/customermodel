@@ -1,0 +1,68 @@
+# Deployment ignore file for Azure App Service
+# Files and directories listed here will be excluded from the deployment package
+
+# Node modules - will be reinstalled by build process
+node_modules/
+api/node_modules/
+
+# Git and version control
+.git/
+.gitignore
+.github/
+
+# IDE and editor files
+.vscode/
+.vs/
+*.code-workspace
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Development and configuration files
+.env
+.env.local
+.env.*.local
+local.settings.json
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build artifacts and temporary files
+dist/
+build/
+temp/
+tmp/
+*.tmp
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Testing
+coverage/
+.nyc_output/
+test/
+
+# Package manager lock files (npm will regenerate)
+# Note: package-lock.json can be large, but keeping for consistency
+# Uncomment below if needed
+# package-lock.json
+
+# Documentation (optional - keep if you want in deployment)
+# *.md
+
+# Azure specific
+.azure/
+*.publishsettings
+
+# Backup files
+*.bak
+*.backup
+*~
