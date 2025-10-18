@@ -23,9 +23,11 @@ app.use(express.urlencoded({ extended: true }));
 if (!isProduction) {
   app.use((req, res, next) => {
     if (req.path.endsWith('.js') || req.path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+      // Aggressive cache busting headers
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0, s-maxage=0');
       res.setHeader('Pragma', 'no-cache');
       res.setHeader('Expires', '0');
+      res.setHeader('ETag', `W/"dev-${Date.now()}"`); // Force new ETag on every request
     }
     next();
   });
